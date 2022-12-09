@@ -1,6 +1,5 @@
 ﻿using BinanceAPI.NET.Core.Models.Enums;
 using BinanceAPI.NET.Core.Models.Socket;
-using BinanceAPI.NET.Infrastructure.Connectivity.Socket;
 using BinanceAPI.NET.Infrastructure.Extensions;
 using BinanceAPI.NET.Infrastructure.Interfaces;
 

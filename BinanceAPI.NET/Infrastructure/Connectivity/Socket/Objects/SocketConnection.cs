@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using BinanceAPI.NET.Infrastructure.Connectivity.Socket;
+using BinanceAPI.NET.Infrastructure.Interfaces;
 
-namespace BinanceBOT
+namespace BinanceAPI.NET.Infrastructure.Connectivity.Socket.Objects
 {
     internal class SocketConnection
     {

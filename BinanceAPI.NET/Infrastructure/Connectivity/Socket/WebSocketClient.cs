@@ -1,6 +1,7 @@
 ﻿using BinanceAPI.NET.Core.Primitives;
 using BinanceAPI.NET.Infrastructure.Connectivity.Socket.Configuration;
 using BinanceAPI.NET.Infrastructure.Enums;
+using BinanceAPI.NET.Infrastructure.Interfaces;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Concurrent;
