@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using BinanceAPI.NET.Infrastructure.Connectivity.HTTP.Objects;
 
 namespace BinanceAPI.NET.Infrastructure.Connectivity.HTTP.Configuration
 {
@@ -17,6 +18,7 @@ namespace BinanceAPI.NET.Infrastructure.Connectivity.HTTP.Configuration
         public List<KeyValuePair<string, string>> Parameters { get; set; } = new();
 
         public ApiCredentials Credentials { get; set; }
+        public TimeSpan Timeout { get; set; }
 
         public HttpConfiguration(ApiCredentials apiCredentials)
         {
@@ -25,16 +27,6 @@ namespace BinanceAPI.NET.Infrastructure.Connectivity.HTTP.Configuration
 
         }
 
-        public string GetHmacSha256Signature(string key)
-        {
-            byte[] keyBytes= Encoding.GetBytes(key);
-            byte[] toEncodeBytes = Encoding.GetBytes(Credentials.ApiSecret);
-
-            byte[] hash;
-            using(HMACSHA256 encoder = new(keyBytes))
-                hash = encoder.ComputeHash(toEncodeBytes);
-
-            return BitConverter.ToString(hash).Replace("-","");
-        }
+        
     }
 }

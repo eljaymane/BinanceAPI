@@ -1,4 +1,4 @@
-﻿namespace BinanceAPI.NET.Infrastructure.Connectivity.HTTP.Configuration
+﻿namespace BinanceAPI.NET.Infrastructure.Connectivity.HTTP.Objects
 {
     public class ApiCredentials
     {

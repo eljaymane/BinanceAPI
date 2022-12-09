@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BinanceAPI.NET.Infrastructure.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http.Headers;
@@ -35,20 +36,20 @@ namespace BinanceAPI.NET.Infrastructure.Connectivity.HTTP.Objects
 
         public Uri Uri => request.RequestUri;
 
-        public Request AddHeader(KeyValuePair<string, string> header)
+        public IRequest AddHeader(KeyValuePair<string, string> header)
         {
             request.Headers.Add(header.Key, header.Value);
             return this;
         }
 
-        public Request AddStringContent(string content, string contentType)
+        public IRequest AddStringContent(string content, string contentType)
         {
             Content = content;
             request.Content = new StringContent(content, Encoding.UTF8, contentType);
             return this;
         }
 
-        public Request AddByteContent(byte[] content)
+        public IRequest AddByteContent(byte[] content)
         {
             request.Content = new ByteArrayContent(content);
             return this;
@@ -64,5 +65,9 @@ namespace BinanceAPI.NET.Infrastructure.Connectivity.HTTP.Objects
             return new Response(await client.SendAsync(request, cancellationToken).ConfigureAwait(false));
         }
 
+        public void Dispose()
+        {
+            throw new NotImplementedException();
+        }
     }
 }
