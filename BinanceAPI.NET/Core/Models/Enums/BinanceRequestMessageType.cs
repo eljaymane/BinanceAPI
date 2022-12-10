@@ -11,7 +11,7 @@ namespace BinanceAPI.NET.Core.Models.Enums
 {
     [Serializable]
     [JsonConverter(typeof(RequestMessageTypeJsonConverter))]
-    internal enum BinanceRequestMessageType
+    public enum BinanceRequestMessageType
     {
         [StringValue("SUBSCRIBE")]
         Subscribe,

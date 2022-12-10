@@ -8,9 +8,9 @@ namespace BinanceAPI.NET.Infrastructure.Connectivity.Socket.Configuration
 {
     public class SocketConfiguration
     {
-        public int SOCKET_BUFFER_SIZE { get { return 65536; } }
+        public int SOCKET_BUFFER_SIZE { get { return 8192; } }
 
-        public static string STREAMS_BASE_URI { get { return "wss://stream.binance.com:9443"; } }
+        public static string STREAMS_BASE_URI { get { return "wss://fstream.binance.com:443/"; } }
 
         public Uri BaseUri { get; set; }
 
@@ -21,7 +21,7 @@ namespace BinanceAPI.NET.Infrastructure.Connectivity.Socket.Configuration
         public bool AutoReconnect { get; set; }
         public TimeSpan? Timeout { get; set; }
         public TimeSpan? KeepAliveInterval { get; set; }
-        public int? PacketPerSecond { get; set; }
+        public int? PacketPerSecond { get; set; } = 5;
         public string? Origin { get; set; }
 
         public Func<byte[],string>? DataInterpreterBytes { get; set; }

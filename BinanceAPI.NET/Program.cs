@@ -1,5 +1,5 @@
 ﻿// See https://aka.ms/new-console-template for more information
-using BinanceAPI.NET.Core.Models.Socket.Clients;
+using BinanceAPI.NET.Core.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;

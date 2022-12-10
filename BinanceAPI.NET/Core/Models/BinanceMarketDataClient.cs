@@ -4,7 +4,7 @@ using BinanceBOT;
 using Microsoft.Extensions.Logging;
 using System.Runtime.CompilerServices;
 
-namespace BinanceAPI.NET.Core.Models.Socket.Clients
+namespace BinanceAPI.NET.Core.Models
 {
     public class BinanceMarketDataClient
     {
@@ -16,15 +16,15 @@ namespace BinanceAPI.NET.Core.Models.Socket.Clients
 
         public CancellationTokenSource TokenSource { get; set; }
 
-        public BinanceMarketDataClient(string symbol,CancellationTokenSource tokenSource)
+        public BinanceMarketDataClient(string symbol, CancellationTokenSource tokenSource)
         {
             Symbol = symbol;
             TokenSource = tokenSource;
         }
 
-        public void SubscribeToKlineStreamAsync(KlineInterval interval = KlineInterval.FifteenMinutes) 
+        public void SubscribeToKlineStreamAsync(KlineInterval interval = KlineInterval.FifteenMinutes)
         {
-            KlineStream = new BinanceKlineStream(interval, Symbol, TokenSource);
+            KlineStream = new BinanceKlineStream(interval, Symbol, TokenSource,LoggerFactory);
             KlineStream = KlineStream.SetLoggerFactory(LoggerFactory);
             KlineStream.SubscribeAsync();
         }
