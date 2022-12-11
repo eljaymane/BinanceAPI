@@ -14,6 +14,7 @@ namespace BinanceAPI.NET.Core.Abstractions
         public BinanceStreamType StreamType { get; private set; }
         public IWebSocketService<BinanceWebSocketRequestMessage> Client { get; private set; }
 
+        internal SemaphoreSlim dataSem = new SemaphoreSlim(1,1);
         internal T? data { get; set; }
 
         public AbstractBinanceStream(BinanceStreamType streamType,SocketConfiguration configuration,ILoggerFactory loggerFactory,CancellationTokenSource ctSource)

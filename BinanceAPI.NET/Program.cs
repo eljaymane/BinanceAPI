@@ -1,5 +1,6 @@
 ﻿// See https://aka.ms/new-console-template for more information
 using BinanceAPI.NET.Core.Models;
+using BinanceAPI.NET.Core.Models.Enums;
 using BinanceAPI.NET.Infrastructure.Connectivity.Socket.Configuration;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -55,8 +56,22 @@ var builder = CreateHostBuilder(args).ConfigureServices((_, services) => service
 var host = builder.Build();
 
 
-var configuration = new SocketConfiguration(new Uri("wss:stream.binance.com/ws/"), true);
-BinanceMarketDataClient client = new(loggerFactory,configuration,new CancellationTokenSource());
+var configuration = new SocketConfiguration(new Uri("wss://stream.binance.com/"), true);
+BinanceMarketDataService client = new(loggerFactory,configuration,new CancellationTokenSource());
 client.LoggerFactory = loggerFactory;
-client.SubscribeToKlineStreamAsync("BTCBUSD");
+client.KlineStream?.SubscribeAsync(KlineInterval.ThirtyMinutes,"BTCBUSD");
+
+var threadData = new Thread(async () =>
+{
+    while (true) 
+    {
+        var data = await client.KlineStream?.GetKlineDataAsync()!;
+        Console.WriteLine(data);
+        Thread.Sleep(4000);
+    }
+
+    
+});
+
+threadData.Start();
 

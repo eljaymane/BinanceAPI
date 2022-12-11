@@ -1,10 +1,10 @@
-﻿using BinanceAPI.NET.Infrastructure.Interfaces;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
+using BinanceAPI.NET.Infrastructure.Interfaces;
 
 namespace BinanceAPI.NET.Infrastructure.Connectivity.HTTP.Objects
 {

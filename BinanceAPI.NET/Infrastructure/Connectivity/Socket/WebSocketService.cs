@@ -5,9 +5,11 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 
 namespace BinanceAPI.NET.Infrastructure.Connectivity.Socket
 {
@@ -38,15 +40,17 @@ namespace BinanceAPI.NET.Infrastructure.Connectivity.Socket
             return Task.FromResult(obj);
         }
 
-        private Task<byte[]> Serialize(T obj)
+        private Task<byte[]> Serialize(T obj,JsonSerializerOptions serializerOptions)
         {
             var jsonBytes = Encoding.UTF8.GetBytes(JsonSerializer.Serialize<T>(obj));
             return Task.FromResult(jsonBytes);
         }
 
-        public async override void SendRequestAsync(T request)
+        public async override void SendRequestAsync(T request, JsonSerializerOptions? serializerOptions = null)
         {
+            serializerOptions ??= new JsonSerializerOptions();
             await Client.SendAsync(new ArraySegment<byte>(Serialize(request).Result));
         }
+        public async void SendRequestAsync(T request,JsonSerializerOptions? serializerOptions)
     }
 }

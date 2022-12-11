@@ -8,7 +8,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace BinanceAPI.NET.Core.Models.Streams.KlineCandlestick
+namespace BinanceAPI.NET.Core.Models
 {
     [Serializable]
     public class BinanceKlineCandlestickData : IBinanceStreamData
@@ -19,7 +19,7 @@ namespace BinanceAPI.NET.Core.Models.Streams.KlineCandlestick
         public TimeSpan EndTime { get; set; }
         [JsonPropertyName("s")]
         public string Symbol { get; set; }
-        [JsonPropertyName("i"),JsonConverter(typeof(KlineIntervalJsonConverter))]
+        [JsonPropertyName("i"), JsonConverter(typeof(KlineIntervalJsonConverter))]
         public KlineInterval Interval { get; set; }
         [JsonPropertyName("f")]
         public int FirstTradeId { get; set; }

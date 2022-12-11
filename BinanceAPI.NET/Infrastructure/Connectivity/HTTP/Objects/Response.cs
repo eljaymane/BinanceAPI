@@ -1,5 +1,5 @@
-﻿using BinanceAPI.NET.Infrastructure.Interfaces;
-using System.Net;
+﻿using System.Net;
+using BinanceAPI.NET.Infrastructure.Interfaces;
 
 namespace BinanceAPI.NET.Infrastructure.Connectivity.HTTP.Objects
 {

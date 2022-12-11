@@ -25,16 +25,14 @@ namespace BinanceAPI.NET.Core.Models.Streams.KlineCandlestick
         public void SubscribeAsync(KlineInterval interval,string symbol)
         {
             var request = new BinanceWebSocketRequestMessage(0,
-                BinanceRequestMessageType.Subscribe, new string[] { Name + interval.GetStringValue()});
+                BinanceRequestMessageType.Subscribe, new string[] { symbol.ToLower() + "@" + interval.GetStringValue()});
             Client.SendRequestAsync(request);
         }
 
         public Task<BinanceKlineCandlestickData> GetKlineDataAsync()
         {
-            lock (data!)
-            {
-                return Task.FromResult(data);
-            }
+            dataSem.Wait();
+            return Task.FromResult(data);
         }
 
         public BinanceKlineStreamService SetLoggerFactory(ILoggerFactory loggerFactory)
@@ -71,7 +69,9 @@ namespace BinanceAPI.NET.Core.Models.Streams.KlineCandlestick
 
         public override void OnMessage(dynamic message)
         {
-            throw new NotImplementedException();
+            dataSem.Wait();
+            data = message;
+            dataSem.Release();
         }
 
         public override void OnReconnecting()
