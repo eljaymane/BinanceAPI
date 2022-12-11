@@ -17,5 +17,7 @@ namespace BinanceAPI.NET.Infrastructure.Interfaces
 
         Task ConnectAsync();
 
+        Task SendAsync(ArraySegment<byte> data);
+
     }
 }

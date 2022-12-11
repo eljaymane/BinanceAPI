@@ -4,10 +4,7 @@ using BinanceAPI.NET.Infrastructure.Enums;
 using BinanceAPI.NET.Infrastructure.Interfaces;
 using Microsoft.Extensions.Logging;
 using System.Collections.Concurrent;
-using System.Net;
 using System.Net.WebSockets;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BinanceAPI.NET.Infrastructure.Connectivity.Socket
 {
@@ -30,10 +27,7 @@ namespace BinanceAPI.NET.Infrastructure.Connectivity.Socket
 
         private readonly AsyncAutoResetEvent _sendEvent;
         private readonly ConcurrentQueue<byte[]> _sendBuffer;
-        private SemaphoreSlim sendBufferSem = new(1,1);
-        private readonly SemaphoreSlim _closeSem;
         public  List<ReceivedPacket> _receivedPackets;
-        private readonly object _receivedPacketsLock;
         private readonly List<DateTime> _sentPackets;
         private CancellationTokenSource _ctsSource = new CancellationTokenSource();
 
@@ -56,34 +50,27 @@ namespace BinanceAPI.NET.Infrastructure.Connectivity.Socket
         public bool IsClosed => _socket.State == WebSocketState.Closed;
 
         public event Action<Exception>? OnError;
-        public event Action<string>? OnReceive;
+        public event Action<dynamic>? OnMessage;
         public event Action? OnClose;
         public event Action? OnOpen;
         public event Action? OnReconnecting;
         public event Action? OnReconnected;
 
-        public WebSocketClient(ILogger logger,SocketConfiguration configuration,CancellationTokenSource ctsSource)
+        public WebSocketClient(ILogger logger,SocketConfiguration configuration,CancellationTokenSource? ctsSource = null)
         {
             Id = NextStreamId();
             _logger = logger;
             Configuration = configuration;
-            _ctsSource = ctsSource;
+            _ctsSource = ctsSource == null ? new CancellationTokenSource() : ctsSource;
             _sentPackets = new();
             _receivedPackets = new();
             _sendEvent = new();
             _sendBuffer = new();
-            _receivedPacketsLock = new();
-            _closeSem = new(1, 1);
             _socket = CreateSocket();
         }
 
         private ClientWebSocket CreateSocket()
         {
-            //var cookieContainer = new CookieContainer();
-            //foreach (var cookie in Configuration.Cookies)
-            //{
-            //    cookieContainer.Add(new Cookie(cookie.Key, cookie.Value));
-            //}
             var socket = new ClientWebSocket();
             try
             {
@@ -100,16 +87,12 @@ namespace BinanceAPI.NET.Infrastructure.Connectivity.Socket
 
         public virtual async Task ConnectAsync()
         {
-
-               _socket.ConnectAsync(new Uri("wss://stream.binance.com/ws"), _ctsSource.Token).Wait(_ctsSource.Token);
+            _socket.ConnectAsync(BaseUri, _ctsSource.Token).Wait(_ctsSource.Token);
             var t1 = new Thread(async () => { await StartSendingAsync().ConfigureAwait(false); });
             t1.Start();
-            
-                var t2 = new Thread( async () => {await  StartReceivingAsync().ConfigureAwait(false); });
-                t2.Start();
-                
-            OnOpen?.Invoke();
-            
+            var t2 = new Thread( async () => {await  StartReceivingAsync().ConfigureAwait(false); });
+            t2.Start(); 
+            OnOpen?.Invoke();  
         }
 
         private async Task StartSendingAsync()
@@ -117,54 +100,49 @@ namespace BinanceAPI.NET.Infrastructure.Connectivity.Socket
            
             while (true)
             {
-
                _sendEvent.WaitAsync();
-                
-
-                    _logger.LogInformation("Sending");
-                    
-                    if(_sendBuffer.TryDequeue(out var data))
-                    {
-                        await _socket.SendAsync(data, WebSocketMessageType.Text, true, _ctsSource.Token).ConfigureAwait(false);
-                    }
-                
+                if(_sendBuffer.TryDequeue(out var data))
+                {
+                _logger.LogInformation("Sending");
+                await _socket.SendAsync(data, WebSocketMessageType.Text, true, _ctsSource.Token).ConfigureAwait(false);
+                }
             }
-           
-
         }
 
         private async Task StartReceivingAsync()
         {
            while (!_ctsSource.IsCancellationRequested)
             {
-                //_sendEvent.WaitAsync();
-                //_logger.LogInformation("Receiving");
-                var buffer= new byte[Configuration.SOCKET_BUFFER_SIZE];
-                var result = await _socket.ReceiveAsync(buffer,_ctsSource.Token).ConfigureAwait(false);
-                string json = Configuration.Encoding.GetString(buffer);
-               
+                var buffer= new ArraySegment<byte>(new byte[Configuration.SOCKET_BUFFER_SIZE]);
+                WebSocketReceiveResult result = await _socket.ReceiveAsync(buffer,_ctsSource.Token).ConfigureAwait(false);
+                HandleMessage(result);
+                //string json = Configuration.Encoding.GetString(buffer).Replace("\0","");
+                //dynamic d = JsonSerializer.Deserialize(json,typeof(object));
             }
         }
 
-        private void HandleMessage(byte[] buffer, int offset, int count,WebSocketMessageType messageType)
+        private void HandleMessage(WebSocketReceiveResult message)
         {
-           
+            if (message.MessageType == WebSocketMessageType.Close)
+            {
+                CloseInternalAsync().Wait();
+                _ctsSource.Cancel();
+                OnClose?.Invoke();
+            } else
+            {
+                OnMessage?.Invoke(message);
+            }
         }
 
-        public virtual void Send(string data)
+        public virtual Task SendAsync(ArraySegment<byte> data)
         {
-            if (_ctsSource.IsCancellationRequested) return;
-            var bytes = Encoding.UTF8.GetBytes(data);
-            lock (sendBufferSem)
+            if (_ctsSource.IsCancellationRequested) return Task.FromCanceled(_ctsSource.Token);
+            lock (_sendBuffer)
             {
-                _sendBuffer.Enqueue(bytes);
+                _sendBuffer.Enqueue(data.Array!);
                 _sendEvent.Set();
             }
-           
-           
-            
-            
-
+            return Task.CompletedTask;
         }
         private async Task CloseInternalAsync()
         {
@@ -214,7 +192,7 @@ namespace BinanceAPI.NET.Infrastructure.Connectivity.Socket
         protected void InvokeOnReceive(string data)
         {
             LastActionTime = DateTime.UtcNow;
-            OnReceive.Invoke(data);
+            OnMessage.Invoke(data);
         }
 
         protected void InvokeOnError(Exception e) => OnError?.Invoke(e);

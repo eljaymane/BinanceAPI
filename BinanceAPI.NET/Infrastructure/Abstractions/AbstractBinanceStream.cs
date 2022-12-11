@@ -1,37 +1,40 @@
 ﻿using BinanceAPI.NET.Core.Models.Enums;
 using BinanceAPI.NET.Core.Models.Socket;
+using BinanceAPI.NET.Core.Models.Streams.KlineCandlestick;
+using BinanceAPI.NET.Infrastructure.Connectivity.Socket;
 using BinanceAPI.NET.Infrastructure.Extensions;
 using BinanceAPI.NET.Infrastructure.Interfaces;
+using Microsoft.Extensions.Logging;
 
 namespace BinanceAPI.NET.Infrastructure.Abstractions
 {
-    public class AbstractBinanceStream : IBinanceStream
+    public abstract class AbstractBinanceStream<T> where T : IBinanceStreamData
     {
-        private string Symbol;
-        public string? Name;
-        private BinanceStreamType StreamType;
+        public string? Name { get; set; }
+        public BinanceStreamType StreamType { get; private set; }
+        public IWebSocketService<BinanceWebSocketRequestMessage> Client { get; private set; }
 
-        public IWebSocket Client;
-        public CancellationTokenSource TokenSource;
+        internal T? data { get; set; }
 
-
-        public AbstractBinanceStream(string symbol, BinanceStreamType streamType, CancellationTokenSource tokenSource)
+        public AbstractBinanceStream(BinanceStreamType streamType,IWebSocketService<BinanceWebSocketRequestMessage> client) 
         {
-            Name = symbol.ToLower() + StreamType.GetStringValue();
-            Symbol = symbol;
             StreamType = streamType;
-            TokenSource = tokenSource;
+            Client = client;
         }
 
-  
 
-        public void OnPingMessage()
-        {
-           // Client.OnPingMessage(TokenSource.Token);
-        }
+        public abstract void Initialize();
 
-        public void SubscribeAsync()
-        {
-        }
+        public abstract void OnError(Exception exception);
+
+        public abstract void OnClose();
+
+        public abstract void OnOpen();
+
+        public abstract void OnMessage(dynamic message);
+
+        public abstract void OnReconnecting();
+
+        public abstract void OnReconnected();
     }
 }

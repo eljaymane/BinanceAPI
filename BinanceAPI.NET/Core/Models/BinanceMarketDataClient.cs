@@ -1,6 +1,7 @@
 ﻿using BinanceAPI.NET.Core.Models.Enums;
 using BinanceAPI.NET.Core.Models.Streams;
-using BinanceBOT;
+using BinanceAPI.NET.Core.Models.Streams.KlineCandlestick;
+using BinanceAPI.NET.Infrastructure.Connectivity.Socket.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Runtime.CompilerServices;
 
@@ -9,24 +10,20 @@ namespace BinanceAPI.NET.Core.Models
     public class BinanceMarketDataClient
     {
         public ILoggerFactory LoggerFactory { get; set; }
-        private BinanceKlineStream? KlineStream { get; set; }
+        private BinanceKlineStreamService? KlineStream { get; set; }
         private BinanceIndividualSymbolTickerStream? SymbolTickerStream { get; set; }
-
-        private string Symbol;
 
         public CancellationTokenSource TokenSource { get; set; }
 
-        public BinanceMarketDataClient(string symbol, CancellationTokenSource tokenSource)
+        public BinanceMarketDataClient(ILoggerFactory loggerFactory,SocketConfiguration socketConfiguration, CancellationTokenSource tokenSource)
         {
-            Symbol = symbol;
             TokenSource = tokenSource;
+            KlineStream = new BinanceKlineStreamService(loggerFactory, socketConfiguration,tokenSource);
         }
 
-        public void SubscribeToKlineStreamAsync(KlineInterval interval = KlineInterval.FifteenMinutes)
+        public void SubscribeToKlineStreamAsync(string symbol,KlineInterval interval = KlineInterval.FifteenMinutes)
         {
-            KlineStream = new BinanceKlineStream(interval, Symbol, TokenSource,LoggerFactory);
-            KlineStream = KlineStream.SetLoggerFactory(LoggerFactory);
-            KlineStream.SubscribeAsync();
+             KlineStream?.SubscribeAsync(interval,symbol);
         }
 
     }
