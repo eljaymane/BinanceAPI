@@ -1,7 +1,7 @@
-﻿using BinanceAPI.NET.Core.Models.Enums;
+﻿using BinanceAPI.NET.Core.Abstractions;
+using BinanceAPI.NET.Core.Models.Enums;
 using BinanceAPI.NET.Core.Models.Socket;
 using BinanceAPI.NET.Core.Models.Socket.Clients;
-using BinanceAPI.NET.Infrastructure.Abstractions;
 using BinanceAPI.NET.Infrastructure.Connectivity.Socket;
 using BinanceAPI.NET.Infrastructure.Connectivity.Socket.Configuration;
 using BinanceAPI.NET.Infrastructure.Extensions;
@@ -16,18 +16,17 @@ namespace BinanceAPI.NET.Core.Models.Streams.KlineCandlestick
         private CancellationTokenSource ctSource;
 
 
-        public BinanceKlineStreamService(CancellationTokenSource tokenSource, ILoggerFactory loggerFactory) : base(BinanceStreamType.KlineCandlestick)
+        public BinanceKlineStreamService(ILoggerFactory loggerFactory,SocketConfiguration configuration,CancellationTokenSource tokenSource) : base(BinanceStreamType.KlineCandlestick,configuration,loggerFactory,tokenSource)
         {
-            
             _loggerFactory = loggerFactory;
             ctSource = tokenSource;
         }
 
-        public async void SubscribeAsync(KlineInterval interval,string symbol)
+        public void SubscribeAsync(KlineInterval interval,string symbol)
         {
             var request = new BinanceWebSocketRequestMessage(0,
                 BinanceRequestMessageType.Subscribe, new string[] { Name + interval.GetStringValue()});
-            await Client.SendRequestAsync(request);
+            Client.SendRequestAsync(request);
         }
 
         public Task<BinanceKlineCandlestickData> GetKlineDataAsync()

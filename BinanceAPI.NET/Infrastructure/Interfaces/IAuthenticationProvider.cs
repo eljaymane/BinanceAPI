@@ -1,6 +1,4 @@
-﻿using BinanceAPI.NET.Infrastructure.Interfaces;
-
-namespace BinanceAPI.NET.Infrastructure.Connectivity
+﻿namespace BinanceAPI.NET.Infrastructure.Interfaces
 {
     public interface IAuthenticationProvider
     {

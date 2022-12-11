@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BinanceAPI.NET.Infrastructure.Enums
 {
-    public enum SignOutputTypes
+    public enum SignOutputType
     {
         Base64,
         HexString

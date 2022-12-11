@@ -1,12 +1,12 @@
-﻿using BinanceAPI.NET.Core.Models.Enums;
+﻿using BinanceAPI.NET.Core.Interfaces;
+using BinanceAPI.NET.Core.Models.Enums;
 using BinanceAPI.NET.Core.Models.Socket;
-using BinanceAPI.NET.Core.Models.Streams.KlineCandlestick;
 using BinanceAPI.NET.Infrastructure.Connectivity.Socket;
-using BinanceAPI.NET.Infrastructure.Extensions;
+using BinanceAPI.NET.Infrastructure.Connectivity.Socket.Configuration;
 using BinanceAPI.NET.Infrastructure.Interfaces;
 using Microsoft.Extensions.Logging;
 
-namespace BinanceAPI.NET.Infrastructure.Abstractions
+namespace BinanceAPI.NET.Core.Abstractions
 {
     public abstract class AbstractBinanceStream<T> where T : IBinanceStreamData
     {
@@ -16,10 +16,10 @@ namespace BinanceAPI.NET.Infrastructure.Abstractions
 
         internal T? data { get; set; }
 
-        public AbstractBinanceStream(BinanceStreamType streamType,IWebSocketService<BinanceWebSocketRequestMessage> client) 
+        public AbstractBinanceStream(BinanceStreamType streamType,SocketConfiguration configuration,ILoggerFactory loggerFactory,CancellationTokenSource ctSource)
         {
             StreamType = streamType;
-            Client = client;
+            Client = new WebSocketService<BinanceWebSocketRequestMessage>(configuration, loggerFactory, ctSource);
         }
 
 

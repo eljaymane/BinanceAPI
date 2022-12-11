@@ -1,4 +1,4 @@
-﻿namespace BinanceAPI.NET.Infrastructure.Abstractions
+﻿namespace BinanceAPI.NET.Infrastructure.Interfaces
 {
     public interface IWebSocketService<T>
     {

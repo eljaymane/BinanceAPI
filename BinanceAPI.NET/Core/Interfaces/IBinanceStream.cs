@@ -1,4 +1,4 @@
-﻿namespace BinanceAPI.NET.Infrastructure.Interfaces
+﻿namespace BinanceAPI.NET.Core.Interfaces
 {
     public interface IBinanceStream
     {

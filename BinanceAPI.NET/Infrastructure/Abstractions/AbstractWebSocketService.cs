@@ -22,6 +22,6 @@ namespace BinanceAPI.NET.Infrastructure.Abstractions
         }
 
         public abstract void Start();
-        public abstract Task SendRequestAsync(T request);
+        public abstract void SendRequestAsync(T request);
     }
 }

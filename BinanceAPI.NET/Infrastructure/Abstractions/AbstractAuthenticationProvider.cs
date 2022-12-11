@@ -25,11 +25,11 @@ namespace BinanceAPI.NET.Infrastructure.Abstractions
 
         public abstract IRequest AuthenticateRequest(IRequest request);
 
-        protected static string GetSha256String(string data, SignOutputTypes? outputType = null)
+        protected static string GetSha256String(string data, SignOutputType? outputType = null)
         {
             using var encryptor = SHA256.Create();
             var resultBytes = encryptor.ComputeHash(Encoding.UTF8.GetBytes(data));
-            return outputType == SignOutputTypes.Base64 ? BytesToBase64String(resultBytes) : BytesToHexString(resultBytes);
+            return outputType == SignOutputType.Base64 ? BytesToBase64String(resultBytes) : BytesToHexString(resultBytes);
         }
         protected static byte[] GetSha256Bytes(string data)
         {

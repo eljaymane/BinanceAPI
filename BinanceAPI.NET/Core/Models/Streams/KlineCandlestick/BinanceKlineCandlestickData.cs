@@ -1,6 +1,6 @@
 ﻿using BinanceAPI.NET.Core.Converters;
+using BinanceAPI.NET.Core.Interfaces;
 using BinanceAPI.NET.Core.Models.Enums;
-using BinanceAPI.NET.Infrastructure.Abstractions;
 using System;
 using System.Collections.Generic;
 using System.Linq;

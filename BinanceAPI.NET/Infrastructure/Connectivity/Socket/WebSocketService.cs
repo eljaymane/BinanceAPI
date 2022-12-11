@@ -44,7 +44,7 @@ namespace BinanceAPI.NET.Infrastructure.Connectivity.Socket
             return Task.FromResult(jsonBytes);
         }
 
-        public async override Task SendRequestAsync(T request)
+        public async override void SendRequestAsync(T request)
         {
             await Client.SendAsync(new ArraySegment<byte>(Serialize(request).Result));
         }
