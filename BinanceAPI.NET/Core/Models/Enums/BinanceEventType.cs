@@ -4,10 +4,13 @@ using System.Text.Json.Serialization;
 
 namespace BinanceAPI.NET.Core.Models.Enums
 {
+    [Serializable]
     [JsonConverter(typeof(BinanceEventTypeConverter))]
     public enum BinanceEventType
     {
         [StringValue("kline")]
-        Kline
+        Kline,
+        [StringValue("value")]
+        value
     }
 }

@@ -9,11 +9,12 @@ using BinanceAPI.NET.Infrastructure.Connectivity.Socket.Configuration;
 using BinanceAPI.NET.Infrastructure.Extensions;
 using BinanceAPI.NET.Infrastructure.Interfaces;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using System.Text.Json;
 
 namespace BinanceAPI.NET.Core.Models.Streams.KlineCandlestick
 {
-    public class BinanceKlineStreamService : AbstractBinanceStream<BinanceKlineCandlestickData>
+    public class BinanceKlineStreamService : AbstractBinanceStream<BinanceWebSocketResponse<BinanceKlineCandlestickData>>
     {
         
         private ILoggerFactory _loggerFactory;
@@ -83,11 +84,9 @@ namespace BinanceAPI.NET.Core.Models.Streams.KlineCandlestick
 
         public override void OnMessage(byte[] streamData)
         {
-            var serializerOptions = new JsonSerializerOptions
+            var serializerOptions = new JsonSerializerSettings
             {
-                WriteIndented= true,
-                Converters = { new KlineIntervalJsonConverter(),
-                new BinanceEventTypeConverter()}
+                Converters = { new KlineIntervalJsonConverter()},
             };
             Deserialize(streamData,serializerOptions);
         }

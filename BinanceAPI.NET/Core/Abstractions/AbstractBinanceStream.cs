@@ -9,6 +9,7 @@ using System.Text.Json;
 using System.Text;
 using BinanceAPI.NET.Core.Models;
 using BinanceAPI.NET.Core.Models.Streams.KlineCandlestick;
+using Newtonsoft.Json;
 
 namespace BinanceAPI.NET.Core.Abstractions
 {
@@ -40,16 +41,16 @@ namespace BinanceAPI.NET.Core.Abstractions
 
         public abstract void OnMessage(byte[] streamData);
 
-        public virtual Task<T?> Deserialize(byte[] message,JsonSerializerOptions serializerOptions)
+        public virtual Task<T?> Deserialize(byte[] message,JsonSerializerSettings Options)
         {
             var json = Configuration.Encoding.GetString(message);
-            var obj = JsonSerializer.Deserialize<T>(json);
+            var obj = JsonConvert.DeserializeObject<T>(json,Options);
             return Task.FromResult(obj);
         }
 
         public virtual Task<byte[]> Serialize(T obj, JsonSerializerOptions serializerOptions)
         {
-            var json = JsonSerializer.Serialize<T>(obj, serializerOptions);
+            var json = System.Text.Json.JsonSerializer.Serialize<T>(obj, serializerOptions);
             var jsonBytes = Encoding.UTF8.GetBytes(json);
             return Task.FromResult(jsonBytes);
         }

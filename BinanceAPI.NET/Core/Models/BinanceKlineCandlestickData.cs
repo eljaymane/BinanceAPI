@@ -2,6 +2,7 @@
 using BinanceAPI.NET.Core.Interfaces;
 using BinanceAPI.NET.Core.Models.Enums;
 using BinanceAPI.NET.Infrastructure.Interfaces;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,40 +15,45 @@ namespace BinanceAPI.NET.Core.Models
     [Serializable]
     public class BinanceKlineCandlestickData : IResponseDataType, IBinanceStreamData
     {
-        [JsonPropertyName("t")]
+        [JsonProperty("t")]
         public long StartTime { get; set; }
-        [JsonPropertyName("T")]
+        [JsonProperty("T")]
         public long EndTime { get; set; }
-        [JsonPropertyName("s")]
+        [JsonProperty("s")]
         public string Symbol { get; set; }
-        [JsonPropertyName("i"), JsonConverter(typeof(KlineIntervalJsonConverter))]
+        [JsonProperty("i")]
         public KlineInterval Interval { get; set; }
-        [JsonPropertyName("f")]
-        public int FirstTradeId { get; set; }
-        [JsonPropertyName("L")]
-        public int LastTradeId { get; set; }
-        [JsonPropertyName("o")]
-        public decimal OpenPrice { get; set; }
-        [JsonPropertyName("c")]
-        public decimal ClosePrice { get; set; }
-        [JsonPropertyName("h")]
-        public decimal HighPrice { get; set; }
-        [JsonPropertyName("l")]
-        public decimal LowPrice { get; set; }
-        [JsonPropertyName("v")]
-        public decimal BaseAssetVolume { get; set; }
-        [JsonPropertyName("n")]
+        [JsonProperty("f")]
+        public long FirstTradeId { get; set; }
+        [JsonProperty("L")]
+        public long LastTradeId { get; set; }
+        [JsonProperty("o")]
+        public double OpenPrice { get; set; }
+        [JsonProperty("c")]
+        public double ClosePrice { get; set; }
+        [JsonProperty("h")]
+        public double HighPrice { get; set; }
+        [JsonProperty("l")]
+        public double LowPrice { get; set; }
+        [JsonProperty("v")]
+        public double BaseAssetVolume { get; set; }
+        [JsonProperty("n")]
         public int NumberOfTrades { get; set; }
-        [JsonPropertyName("x")]
+        [JsonProperty("x")]
         public bool IsClosed { get; set; }
-        [JsonPropertyName("q")]
-        public decimal QuoteAssetVolume { get; set; }
-        [JsonPropertyName("V")]
-        public decimal TakerBuyBaseVolume { get; set; }
-        [JsonPropertyName("Q")]
-        public decimal TakerBuyQuoteVolume { get; set; }
+        [JsonProperty("q")]
+        public double QuoteAssetVolume { get; set; }
+        [JsonProperty("V")]
+        public double TakerBuyBaseVolume { get; set; }
+        [JsonProperty("Q")]
+        public double TakerBuyQuoteVolume { get; set; }
+        [JsonProperty("B")]
+        public string ignore { get; set; }
 
+        public BinanceKlineCandlestickData()
+        {
 
+        }
 
     }
 }
