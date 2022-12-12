@@ -1,7 +1,7 @@
-﻿using BinanceAPI.NET.Core.Primitives;
-using BinanceAPI.NET.Infrastructure.Connectivity.Socket.Configuration;
+﻿using BinanceAPI.NET.Infrastructure.Connectivity.Socket.Configuration;
 using BinanceAPI.NET.Infrastructure.Enums;
 using BinanceAPI.NET.Infrastructure.Interfaces;
+using BinanceAPI.NET.Infrastructure.Primitives;
 using Microsoft.Extensions.Logging;
 using System.Collections.Concurrent;
 using System.Net.WebSockets;
@@ -50,7 +50,7 @@ namespace BinanceAPI.NET.Infrastructure.Connectivity.Socket
         public bool IsClosed => _socket.State == WebSocketState.Closed;
 
         public event Action<Exception>? OnError;
-        public event Action<dynamic>? OnMessage;
+        public event Action<byte[]>? OnMessage;
         public event Action? OnClose;
         public event Action? OnOpen;
         public event Action? OnReconnecting;
@@ -87,11 +87,16 @@ namespace BinanceAPI.NET.Infrastructure.Connectivity.Socket
 
         public virtual async Task ConnectAsync()
         {
+            CancellationTokenSource cts = new(TimeSpan.FromSeconds(5));
             _socket.ConnectAsync(BaseUri, _ctsSource.Token).Wait(_ctsSource.Token);
-            var t1 = new Thread(async () => { await StartSendingAsync().ConfigureAwait(false); });
+            if(_socket.State!= WebSocketState.Open) { _ctsSource.Cancel(); return; }
+            
+            var t2 = new Thread( async () => { await StartReceivingAsync(); });
+            var t1 = new Thread(async () => { await StartSendingAsync(); });
             t1.Start();
-            var t2 = new Thread( async () => {await  StartReceivingAsync().ConfigureAwait(false); });
-            t2.Start(); 
+            t2.Start();
+       
+
             OnOpen?.Invoke();  
         }
 
@@ -104,7 +109,7 @@ namespace BinanceAPI.NET.Infrastructure.Connectivity.Socket
                 if(_sendBuffer.TryDequeue(out var data))
                 {
                 _logger.LogInformation("Sending");
-                await _socket.SendAsync(data, WebSocketMessageType.Text, true, _ctsSource.Token).ConfigureAwait(false);
+                await _socket.SendAsync(data, WebSocketMessageType.Text, true, _ctsSource.Token);
                 }
             }
         }
@@ -115,13 +120,20 @@ namespace BinanceAPI.NET.Infrastructure.Connectivity.Socket
             {
                 var buffer= new ArraySegment<byte>(new byte[Configuration.SOCKET_BUFFER_SIZE]);
                 WebSocketReceiveResult result = await _socket.ReceiveAsync(buffer,_ctsSource.Token).ConfigureAwait(false);
-                HandleMessage(result);
+                HandleMessage(result,await removeZeros(buffer.Array));
+                Thread.Sleep(1000);
                 //string json = Configuration.Encoding.GetString(buffer).Replace("\0","");
                 //dynamic d = JsonSerializer.Deserialize(json,typeof(object));
             }
         }
 
-        private void HandleMessage(WebSocketReceiveResult message)
+        private Task<byte[]> removeZeros(byte[] data)
+        {
+            var stringData = Configuration.Encoding.GetString(data).Replace("\0","");
+            return Task.FromResult(Configuration.Encoding.GetBytes(stringData));
+        }
+
+        private void HandleMessage(WebSocketReceiveResult message, byte[] buffer)
         {
             if (message.MessageType == WebSocketMessageType.Close)
             {
@@ -130,7 +142,7 @@ namespace BinanceAPI.NET.Infrastructure.Connectivity.Socket
                 OnClose?.Invoke();
             } else
             {
-                OnMessage?.Invoke(message);
+                OnMessage?.Invoke(buffer);
             }
         }
 
@@ -189,7 +201,7 @@ namespace BinanceAPI.NET.Infrastructure.Connectivity.Socket
             return _sentPackets.Count;
         }
 
-        protected void InvokeOnReceive(string data)
+        protected void InvokeOnReceive(byte[] data)
         {
             LastActionTime = DateTime.UtcNow;
             OnMessage.Invoke(data);

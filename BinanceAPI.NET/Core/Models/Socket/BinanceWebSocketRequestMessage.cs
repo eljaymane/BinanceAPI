@@ -1,13 +1,14 @@
 ﻿using BinanceAPI.NET.Core.Converters;
 using BinanceAPI.NET.Core.Models.Enums;
 using BinanceAPI.NET.Core.Models.Socket.Clients;
+using BinanceAPI.NET.Infrastructure.Interfaces;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace BinanceAPI.NET.Core.Models.Socket
 {
     [Serializable]
-    public class BinanceWebSocketRequestMessage : IBinanceRequest
+    public class BinanceWebSocketRequestMessage : IBinanceRequest, IRequestDataType
     {
         [JsonPropertyName("id")]
         public uint Id { get; set; }

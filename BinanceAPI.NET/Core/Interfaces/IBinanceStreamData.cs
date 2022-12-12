@@ -1,6 +1,8 @@
-﻿namespace BinanceAPI.NET.Core.Interfaces
+﻿using BinanceAPI.NET.Infrastructure.Interfaces;
+
+namespace BinanceAPI.NET.Core.Interfaces
 {
-    public interface IBinanceStreamData
+    public interface IBinanceStreamData : IResponseDataType
     {
     }
 }

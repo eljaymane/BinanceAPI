@@ -1,6 +1,7 @@
 ﻿using BinanceAPI.NET.Core.Converters;
 using BinanceAPI.NET.Core.Interfaces;
 using BinanceAPI.NET.Core.Models.Enums;
+using BinanceAPI.NET.Infrastructure.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +12,7 @@ using System.Threading.Tasks;
 namespace BinanceAPI.NET.Core.Models
 {
     [Serializable]
-    public class BinanceKlineCandlestickData : IBinanceStreamData
+    public class BinanceKlineCandlestickData : IResponseDataType, IBinanceStreamData
     {
         [JsonPropertyName("t")]
         public TimeSpan StartTime { get; set; }
@@ -45,7 +46,6 @@ namespace BinanceAPI.NET.Core.Models
         public decimal TakerBuyBaseVolume { get; set; }
         [JsonPropertyName("Q")]
         public decimal TakerBuyQuoteVolume { get; set; }
-
 
     }
 }

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BinanceAPI.NET.Core.Primitives
+namespace BinanceAPI.NET.Infrastructure.Primitives
 {
     public class AsyncAutoResetEvent
     {

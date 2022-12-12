@@ -6,13 +6,21 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace BinanceAPI.NET.Infrastructure.Abstractions
 {
-    public abstract class AbstractWebSocketService<T> : IWebSocketService<T>
+    public abstract class AbstractWebSocketService<T> : IWebSocketService<T> where T : IRequestDataType
     {
         internal IWebSocket Client;
+
+        public abstract event Action<Exception>? OnError;
+        public abstract event Action<byte[]>? OnMessage;
+        public abstract event Action? OnClose;
+        public abstract event Action? OnOpen;
+        public abstract event Action? OnReconnecting;
+        public abstract event Action? OnReconnected;
 
         public CancellationTokenSource? CTSource { get; set; }
 
@@ -22,6 +30,8 @@ namespace BinanceAPI.NET.Infrastructure.Abstractions
         }
 
         public abstract void Start();
-        public abstract void SendRequestAsync(T request);
+        public abstract void SendRequestAsync(T request, JsonSerializerOptions? serializerOptions = null);
+        public abstract Task<IResponseDataType?> Deserialize(byte[] message);
+        public abstract Task<byte[]> Serialize(T obj, JsonSerializerOptions serializerOptions);
     }
 }

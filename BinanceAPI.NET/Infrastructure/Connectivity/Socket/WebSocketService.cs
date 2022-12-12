@@ -13,16 +13,17 @@ using System.Xml.Serialization;
 
 namespace BinanceAPI.NET.Infrastructure.Connectivity.Socket
 {
-    public class WebSocketService<T> : AbstractWebSocketService<T>
+    public class WebSocketService<T> : AbstractWebSocketService<T> where T : IRequestDataType
     {
         private ILoggerFactory _loggerFactory;
 
-        public event Action<Exception>? OnError { add => OnError += value; remove => OnError -= value; }
-        public event Action<dynamic>? OnMessage { add => OnMessage += value;remove => OnMessage -= value; }
-        public event Action? OnClose { add => OnClose += value; remove => OnClose -= value; }
-        public event Action? OnOpen { add => OnOpen += value; remove => OnOpen -= value; }
-        public event Action? OnReconnecting { add => OnReconnecting += value; remove => OnReconnecting -= value; }
-        public event Action? OnReconnected { add => OnReconnected += value; remove => OnReconnected -= value; }
+        public override event Action<Exception>? OnError;
+        public override event Action<byte[]>? OnMessage;
+        public override event Action? OnClose;
+        public override event Action? OnOpen;
+        public override event Action? OnReconnecting;
+        public override event Action? OnReconnected;
+
         public WebSocketService(SocketConfiguration configuration,  ILoggerFactory loggerFactory, CancellationTokenSource? ctSource = null) : base(ctSource)
         {
             _loggerFactory = loggerFactory;
@@ -31,26 +32,32 @@ namespace BinanceAPI.NET.Infrastructure.Connectivity.Socket
 
         public override void Start()
         {
-            Client.ConnectAsync();
+            Client.OnError += OnError;
+            Client.OnClose += OnClose;
+            Client.OnReconnecting += OnReconnecting;
+            Client.OnReconnected += OnReconnected;
+            Client.OnMessage += OnMessage;
+            Client.ConnectAsync().Wait();
         }
 
-        private Task<T?> Deserialize(byte[] message)
-        {
-            var obj = JsonSerializer.Deserialize<T>(message);
-            return Task.FromResult(obj);
-        }
-
-        private Task<byte[]> Serialize(T obj,JsonSerializerOptions serializerOptions)
-        {
-            var jsonBytes = Encoding.UTF8.GetBytes(JsonSerializer.Serialize<T>(obj));
-            return Task.FromResult(jsonBytes);
-        }
+     
 
         public async override void SendRequestAsync(T request, JsonSerializerOptions? serializerOptions = null)
         {
             serializerOptions ??= new JsonSerializerOptions();
-            await Client.SendAsync(new ArraySegment<byte>(Serialize(request).Result));
+            await Client.SendAsync(new ArraySegment<byte>(Serialize(request,serializerOptions).Result));
         }
-        public async void SendRequestAsync(T request,JsonSerializerOptions? serializerOptions)
+
+   
+        public override Task<byte[]> Serialize(T obj, JsonSerializerOptions serializerOptions)
+        {
+            return Task.FromResult(Encoding.UTF8.GetBytes(JsonSerializer.Serialize<T>(obj, serializerOptions)));
+        }
+
+        public override Task<IResponseDataType?> Deserialize(byte[] message)
+        {
+            throw new NotImplementedException();
+        }
+
     }
 }

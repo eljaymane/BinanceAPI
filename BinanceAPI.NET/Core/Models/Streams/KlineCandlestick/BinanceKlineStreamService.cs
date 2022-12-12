@@ -1,11 +1,15 @@
 ﻿using BinanceAPI.NET.Core.Abstractions;
+using BinanceAPI.NET.Core.Converters;
+using BinanceAPI.NET.Core.Interfaces;
 using BinanceAPI.NET.Core.Models.Enums;
 using BinanceAPI.NET.Core.Models.Socket;
 using BinanceAPI.NET.Core.Models.Socket.Clients;
 using BinanceAPI.NET.Infrastructure.Connectivity.Socket;
 using BinanceAPI.NET.Infrastructure.Connectivity.Socket.Configuration;
 using BinanceAPI.NET.Infrastructure.Extensions;
+using BinanceAPI.NET.Infrastructure.Interfaces;
 using Microsoft.Extensions.Logging;
+using System.Text.Json;
 
 namespace BinanceAPI.NET.Core.Models.Streams.KlineCandlestick
 {
@@ -20,19 +24,29 @@ namespace BinanceAPI.NET.Core.Models.Streams.KlineCandlestick
         {
             _loggerFactory = loggerFactory;
             ctSource = tokenSource;
+          Initialize(); 
+            Client.Start();
         }
 
         public void SubscribeAsync(KlineInterval interval,string symbol)
         {
             var request = new BinanceWebSocketRequestMessage(0,
                 BinanceRequestMessageType.Subscribe, new string[] { symbol.ToLower() + "@" + interval.GetStringValue()});
-            Client.SendRequestAsync(request);
+            var serializerOptions = new JsonSerializerOptions
+            {
+                WriteIndented = true,
+                Converters =
+                {
+                    new RequestMessageTypeJsonConverter()
+                }
+            };
+            Client.SendRequestAsync(request,serializerOptions);
         }
 
         public Task<BinanceKlineCandlestickData> GetKlineDataAsync()
         {
             dataSem.Wait();
-            return Task.FromResult(data);
+            return Task.FromResult((BinanceKlineCandlestickData)data);
         }
 
         public BinanceKlineStreamService SetLoggerFactory(ILoggerFactory loggerFactory)
@@ -43,13 +57,13 @@ namespace BinanceAPI.NET.Core.Models.Streams.KlineCandlestick
 
         public override void Initialize()
         {
-            Client.OnError += OnError;
+            Client.OnError+= OnError;
             Client.OnClose+= OnClose;
             Client.OnReconnected+= OnReconnected;
             Client.OnReconnecting+= OnReconnecting;
             Client.OnMessage += OnMessage;
             Client.OnOpen+= OnOpen;
-            Client.Start();
+            //Client.Start();
         }
 
         public override void OnError(Exception exception)
@@ -67,11 +81,9 @@ namespace BinanceAPI.NET.Core.Models.Streams.KlineCandlestick
             throw new NotImplementedException();
         }
 
-        public override void OnMessage(dynamic message)
+        public override void OnMessage(byte[] streamData)
         {
-            dataSem.Wait();
-            data = message;
-            dataSem.Release();
+            base.OnMessage(streamData);
         }
 
         public override void OnReconnecting()
