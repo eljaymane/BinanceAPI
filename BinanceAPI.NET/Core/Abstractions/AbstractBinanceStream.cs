@@ -15,6 +15,7 @@ namespace BinanceAPI.NET.Core.Abstractions
         public string? Name { get; set; }
         public BinanceStreamType StreamType { get; private set; }
         public IWebSocketService<BinanceWebSocketRequestMessage> Client { get; private set; }
+        public SocketConfiguration Configuration { get; private set; }
 
         internal SemaphoreSlim dataSem = new SemaphoreSlim(1,1);
         internal IResponseDataType? data { get; set; }
@@ -23,6 +24,7 @@ namespace BinanceAPI.NET.Core.Abstractions
         {
             StreamType = streamType;
             Client = new WebSocketService<BinanceWebSocketRequestMessage>(configuration, loggerFactory, ctSource);
+            Configuration = configuration;
         }
 
 
@@ -34,16 +36,12 @@ namespace BinanceAPI.NET.Core.Abstractions
 
         public abstract void OnOpen();
 
-        public virtual void OnMessage(byte[] streamData)
-        {
-             //dataSem.Wait();
-            data = Deserialize(streamData).Result;
-            //dataSem.Release();
-        }
+        public abstract void OnMessage(byte[] streamData);
 
-        public virtual Task<T?> Deserialize(byte[] message)
+        public virtual Task<T?> Deserialize(byte[] message,JsonSerializerOptions serializerOptions)
         {
-            var obj = JsonSerializer.Deserialize<T>(message);
+            var json = Configuration.Encoding.GetString(message);
+            var obj = JsonSerializer.Deserialize<T>(json,serializerOptions);
             return Task.FromResult(obj);
         }
 

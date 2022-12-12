@@ -7,7 +7,12 @@ namespace BinanceAPI.NET.Core.Converters
 {
     public class BinanceEventTypeConverter : JsonConverter<BinanceEventType>
     {
-            public override BinanceEventType Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        public override bool CanConvert(Type typeToConvert)
+        {
+            if (typeToConvert == typeof(BinanceEventType)) return true;
+            return false;
+        }
+        public override BinanceEventType Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
             {
                 return JsonSerializer.Deserialize<BinanceEventType>(reader.GetString());
             }

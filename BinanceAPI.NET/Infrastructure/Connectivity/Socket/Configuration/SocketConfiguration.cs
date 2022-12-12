@@ -8,7 +8,7 @@ namespace BinanceAPI.NET.Infrastructure.Connectivity.Socket.Configuration
 {
     public class SocketConfiguration
     {
-        public int SOCKET_BUFFER_SIZE { get { return 8192; } }
+        public int SOCKET_BUFFER_SIZE { get { return 65536; } }
 
         public static string STREAMS_BASE_URI { get { return "wss://fstream.binance.com:443/"; } }
 

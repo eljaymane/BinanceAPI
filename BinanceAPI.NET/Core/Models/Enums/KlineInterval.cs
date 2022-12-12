@@ -4,6 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace BinanceAPI.NET.Core.Models.Enums
 {
+    [Serializable]
     [JsonConverter(typeof(KlineIntervalJsonConverter))]
     public enum KlineInterval
     {

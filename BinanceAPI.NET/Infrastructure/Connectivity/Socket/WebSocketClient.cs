@@ -34,10 +34,7 @@ namespace BinanceAPI.NET.Infrastructure.Connectivity.Socket
         private ClientWebSocket _socket;
         
         private WebSocketProcessState _processState;
-        private WebSocketState _socketState;
-        private Task? _processTask;
         private Task? _closeTask;
-        private bool isStopRequested;
         private bool disposed;
         private DateTime lastReconnectTime;
         private DateTime lastReceivedPacketsUpdate;
@@ -105,7 +102,7 @@ namespace BinanceAPI.NET.Infrastructure.Connectivity.Socket
            
             while (true)
             {
-               _sendEvent.WaitAsync();
+               await _sendEvent.WaitAsync();
                 if(_sendBuffer.TryDequeue(out var data))
                 {
                 _logger.LogInformation("Sending");
@@ -116,12 +113,25 @@ namespace BinanceAPI.NET.Infrastructure.Connectivity.Socket
 
         private async Task StartReceivingAsync()
         {
+            var buffer= new ArraySegment<byte>(new byte[Configuration.SOCKET_BUFFER_SIZE]);
            while (!_ctsSource.IsCancellationRequested)
             {
-                var buffer= new ArraySegment<byte>(new byte[Configuration.SOCKET_BUFFER_SIZE]);
-                WebSocketReceiveResult result = await _socket.ReceiveAsync(buffer,_ctsSource.Token).ConfigureAwait(false);
-                HandleMessage(result,await removeZeros(buffer.Array));
-                Thread.Sleep(1000);
+                try
+                {
+                    var result = await _socket.ReceiveAsync(buffer,CancellationToken.None).ConfigureAwait(false);
+                    HandleMessage(result, await removeZeros(buffer.Array));
+                }catch(Exception e)
+                {
+                    _logger.LogError(e.Message);
+                }
+                finally
+                {
+                    buffer = new(new byte[Configuration.SOCKET_BUFFER_SIZE]);
+                    Thread.Sleep(1000);
+                }
+                
+                
+               
                 //string json = Configuration.Encoding.GetString(buffer).Replace("\0","");
                 //dynamic d = JsonSerializer.Deserialize(json,typeof(object));
             }

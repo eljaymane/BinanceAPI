@@ -12,6 +12,12 @@ namespace BinanceAPI.NET.Core.Converters
 {
     public class KlineIntervalJsonConverter : JsonConverter<KlineInterval>
     {
+        public override bool CanConvert(Type typeToConvert)
+        {
+            if (typeToConvert == typeof(KlineInterval)) return true;
+            return false;
+            
+        }
         public override KlineInterval Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             return JsonSerializer.Deserialize<KlineInterval>(reader.GetString());

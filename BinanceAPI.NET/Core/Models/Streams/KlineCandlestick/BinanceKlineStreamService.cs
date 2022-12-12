@@ -13,7 +13,7 @@ using System.Text.Json;
 
 namespace BinanceAPI.NET.Core.Models.Streams.KlineCandlestick
 {
-    public class BinanceKlineStreamService : AbstractBinanceStream<BinanceKlineCandlestickData>
+    public class BinanceKlineStreamService : AbstractBinanceStream<BinanceWebSocketResponse<BinanceKlineCandlestickData>>
     {
         
         private ILoggerFactory _loggerFactory;
@@ -24,14 +24,14 @@ namespace BinanceAPI.NET.Core.Models.Streams.KlineCandlestick
         {
             _loggerFactory = loggerFactory;
             ctSource = tokenSource;
-          Initialize(); 
+            Initialize(); 
             Client.Start();
         }
 
         public void SubscribeAsync(KlineInterval interval,string symbol)
         {
             var request = new BinanceWebSocketRequestMessage(0,
-                BinanceRequestMessageType.Subscribe, new string[] { symbol.ToLower() + "@" + interval.GetStringValue()});
+                BinanceRequestMessageType.Subscribe, new string[] { symbol.ToLower() + StreamType.GetStringValue() +  interval.GetStringValue()});
             var serializerOptions = new JsonSerializerOptions
             {
                 WriteIndented = true,
@@ -83,7 +83,11 @@ namespace BinanceAPI.NET.Core.Models.Streams.KlineCandlestick
 
         public override void OnMessage(byte[] streamData)
         {
-            base.OnMessage(streamData);
+            var serializerOptions = new JsonSerializerOptions
+            {
+                Converters = { new KlineIntervalJsonConverter()}
+            };
+            Deserialize(streamData,serializerOptions);
         }
 
         public override void OnReconnecting()

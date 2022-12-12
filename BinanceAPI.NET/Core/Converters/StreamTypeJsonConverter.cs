@@ -12,6 +12,11 @@ namespace BinanceAPI.NET.Core.Converters
 {
     internal class StreamTypeJsonConverter : JsonConverter<BinanceStreamType>
     {
+        public override bool CanConvert(Type typeToConvert)
+        {
+            if (typeToConvert == typeof(BinanceStreamType)) return true;
+            return false;
+        }
         public override BinanceStreamType Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             return JsonSerializer.Deserialize<BinanceStreamType>(reader.GetString());

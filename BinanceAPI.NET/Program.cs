@@ -56,9 +56,9 @@ var builder = CreateHostBuilder(args).ConfigureServices((_, services) => service
 var host = builder.Build();
 
 
-var configuration = new SocketConfiguration(new Uri("wss://stream.binance.com/ws/streams"), true);
+var configuration = new SocketConfiguration(new Uri("wss://stream.binance.com/ws"), true);
 BinanceMarketDataService client = new(loggerFactory,configuration,new CancellationTokenSource());
-//client.KlineStream?.SubscribeAsync(KlineInterval.ThirtyMinutes,"BTCBUSD");
+client.KlineStream?.SubscribeAsync(KlineInterval.FifteenMinutes,"BTCBUSD");
 
 var threadData = new Thread(async () =>
 {

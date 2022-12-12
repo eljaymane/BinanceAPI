@@ -47,5 +47,10 @@ namespace BinanceAPI.NET.Core.Models
         [JsonPropertyName("Q")]
         public decimal TakerBuyQuoteVolume { get; set; }
 
+        public BinanceKlineCandlestickData()
+        {
+
+        }
+
     }
 }
