@@ -13,7 +13,7 @@ using System.Text.Json;
 
 namespace BinanceAPI.NET.Core.Models.Streams.KlineCandlestick
 {
-    public class BinanceKlineStreamService : AbstractBinanceStream<BinanceWebSocketResponse<BinanceKlineCandlestickData>>
+    public class BinanceKlineStreamService : AbstractBinanceStream<BinanceKlineCandlestickData>
     {
         
         private ILoggerFactory _loggerFactory;
@@ -85,7 +85,9 @@ namespace BinanceAPI.NET.Core.Models.Streams.KlineCandlestick
         {
             var serializerOptions = new JsonSerializerOptions
             {
-                Converters = { new KlineIntervalJsonConverter()}
+                WriteIndented= true,
+                Converters = { new KlineIntervalJsonConverter(),
+                new BinanceEventTypeConverter()}
             };
             Deserialize(streamData,serializerOptions);
         }

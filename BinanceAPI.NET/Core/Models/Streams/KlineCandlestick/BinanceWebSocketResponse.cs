@@ -14,7 +14,6 @@ namespace BinanceAPI.NET.Core.Models.Streams.KlineCandlestick
         public TimeSpan EventTime { get; set; }
         [JsonPropertyName("s")]
         public string Symbol { get; set; }
-        [JsonPropertyName("k")]
         public T Data { get; set; }
 
         public BinanceWebSocketResponse(BinanceEventType eventType, TimeSpan eventTime, string symbol, T data)

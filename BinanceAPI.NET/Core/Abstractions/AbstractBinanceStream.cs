@@ -7,10 +7,12 @@ using BinanceAPI.NET.Infrastructure.Interfaces;
 using Microsoft.Extensions.Logging;
 using System.Text.Json;
 using System.Text;
+using BinanceAPI.NET.Core.Models;
+using BinanceAPI.NET.Core.Models.Streams.KlineCandlestick;
 
 namespace BinanceAPI.NET.Core.Abstractions
 {
-    public abstract class AbstractBinanceStream<T> where T : IResponseDataType
+    public abstract class AbstractBinanceStream<T>
     {
         public string? Name { get; set; }
         public BinanceStreamType StreamType { get; private set; }
@@ -41,7 +43,7 @@ namespace BinanceAPI.NET.Core.Abstractions
         public virtual Task<T?> Deserialize(byte[] message,JsonSerializerOptions serializerOptions)
         {
             var json = Configuration.Encoding.GetString(message);
-            var obj = JsonSerializer.Deserialize<T>(json,serializerOptions);
+            var obj = JsonSerializer.Deserialize<T>(json);
             return Task.FromResult(obj);
         }
 

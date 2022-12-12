@@ -15,9 +15,9 @@ namespace BinanceAPI.NET.Core.Models
     public class BinanceKlineCandlestickData : IResponseDataType, IBinanceStreamData
     {
         [JsonPropertyName("t")]
-        public TimeSpan StartTime { get; set; }
+        public long StartTime { get; set; }
         [JsonPropertyName("T")]
-        public TimeSpan EndTime { get; set; }
+        public long EndTime { get; set; }
         [JsonPropertyName("s")]
         public string Symbol { get; set; }
         [JsonPropertyName("i"), JsonConverter(typeof(KlineIntervalJsonConverter))]
@@ -47,10 +47,7 @@ namespace BinanceAPI.NET.Core.Models
         [JsonPropertyName("Q")]
         public decimal TakerBuyQuoteVolume { get; set; }
 
-        public BinanceKlineCandlestickData()
-        {
 
-        }
 
     }
 }
