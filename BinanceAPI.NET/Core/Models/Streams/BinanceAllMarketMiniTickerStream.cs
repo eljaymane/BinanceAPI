@@ -1,15 +1,11 @@
 ﻿using BinanceAPI.NET.Core.Abstractions;
 using BinanceAPI.NET.Core.Converters;
 using BinanceAPI.NET.Core.Models.Enums;
-using BinanceAPI.NET.Core.Models.Objects;
 using BinanceAPI.NET.Core.Models.Objects.StreamData;
 using BinanceAPI.NET.Core.Models.Socket;
-using BinanceAPI.NET.Infrastructure.Abstractions;
-using BinanceAPI.NET.Infrastructure.Connectivity.Socket;
 using BinanceAPI.NET.Infrastructure.Connectivity.Socket.Configuration;
 using BinanceAPI.NET.Infrastructure.Extensions;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,17 +15,17 @@ using System.Threading.Tasks;
 
 namespace BinanceAPI.NET.Core.Models.Streams
 {
-    public class BinanceIndividualSymbolTickerStream : AbstractBinanceStream<BinanceWebSocketResponseMessage<BinanceTickerData>>
+    public class BinanceAllMarketMiniTickerStream : AbstractBinanceStream<BinanceWebSocketResponseMessage<BinanceMiniTickerData>[]>
     {
-        public BinanceIndividualSymbolTickerStream(SocketConfiguration configuration, ILoggerFactory loggerFactory, CancellationTokenSource tokenSource) : base(BinanceStreamType.IndividualSymbolTicker,configuration,loggerFactory,tokenSource)
+        public BinanceAllMarketMiniTickerStream(SocketConfiguration configuration, ILoggerFactory loggerFactory, CancellationTokenSource ctSource) : base(BinanceStreamType.AllMarketMiniTicker,configuration, loggerFactory, ctSource)
         {
             Initialize();
         }
 
-        public void SubscribeAsync(string symbol)
+        public void SubscribeAsync(KlineInterval interval, string symbol)
         {
             var request = new BinanceWebSocketRequestMessage(0,
-                BinanceRequestMessageType.Subscribe, new string[] { symbol.ToLower() + StreamType.GetStringValue()});
+                BinanceRequestMessageType.Subscribe, new string[] {StreamType.GetStringValue()! });
             var serializerOptions = new JsonSerializerOptions
             {
                 WriteIndented = true,
@@ -40,7 +36,6 @@ namespace BinanceAPI.NET.Core.Models.Streams
             };
             Client.SendRequestAsync(request, serializerOptions);
         }
-
         public override void Initialize()
         {
             Client.OnError += OnError;
@@ -64,11 +59,7 @@ namespace BinanceAPI.NET.Core.Models.Streams
 
         public override void OnMessage(byte[] streamData)
         {
-            var serializerOptions = new JsonSerializerSettings
-            {
-                Converters = { new UnixTimestampDateConverter() },
-            };
-            data = Deserialize(streamData, serializerOptions).Result.Data;
+            throw new NotImplementedException();
         }
 
         public override void OnOpen()
@@ -85,7 +76,5 @@ namespace BinanceAPI.NET.Core.Models.Streams
         {
             throw new NotImplementedException();
         }
-
-       
     }
 }

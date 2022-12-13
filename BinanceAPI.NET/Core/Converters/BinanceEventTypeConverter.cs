@@ -1,26 +1,44 @@
 ﻿using BinanceAPI.NET.Core.Models.Enums;
-using System.Text.Json.Serialization;
-using System.Text.Json;
 using BinanceAPI.NET.Infrastructure.Extensions;
+using Newtonsoft.Json;
 
 namespace BinanceAPI.NET.Core.Converters
 {
     public class BinanceEventTypeConverter : JsonConverter<BinanceEventType>
     {
-        public override bool CanConvert(Type typeToConvert)
-        {
-            if (typeToConvert == typeof(BinanceEventType)) return true;
-            return false;
-        }
-        public override BinanceEventType Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-            {
-                return JsonSerializer.Deserialize<BinanceEventType>(reader.GetString());
-            }
+        private readonly Type[] _types;
 
-            public override void Write(Utf8JsonWriter writer, BinanceEventType value, JsonSerializerOptions options)
+        public BinanceEventTypeConverter(params Type[] types)
+        {
+            _types = types;
+        }
+
+        public override void WriteJson(JsonWriter writer, BinanceEventType value, JsonSerializer serializer)
+        {
+
+            writer.WriteRawValue($"\"e\":\"{value.GetStringValue()}\"");
+        }
+
+        public override BinanceEventType ReadJson(JsonReader reader, Type objectType, BinanceEventType existingValue, bool b, JsonSerializer serializer)
+        {
+            foreach (var param in Enum.GetNames(typeof(BinanceEventType)))
             {
-                writer.WriteStringValue(value.GetStringValue());
+                var kline = Enum.Parse<BinanceEventType>(param);
+                var str = kline.GetStringValue();
+                if (str == reader.Value.ToString()) return Enum.Parse<BinanceEventType>(param);
             }
+            return BinanceEventType.Kline;
+        }
+
+        public override bool CanRead
+        {
+            get { return true; }
+        }
+
+        public bool CanConvert(Type objectType)
+        {
+            return _types.Any(t => t == objectType);
+        }
     }
 
 }

@@ -7,18 +7,17 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace BinanceAPI.NET.Core.Models
+namespace BinanceAPI.NET.Core.Models.Objects.StreamData
 {
     [Serializable]
     public class BinanceKlineCandlestickData : IResponseDataType, IBinanceStreamData
     {
-        [JsonProperty("t")]
-        public long StartTime { get; set; }
-        [JsonProperty("T")]
-        public long EndTime { get; set; }
+        [JsonProperty("t"), JsonConverter(typeof(UnixTimestampDateConverter))]
+        public DateTime StartTime { get; set; }
+        [JsonProperty("T"), JsonConverter(typeof(UnixTimestampDateConverter))]
+        public DateTime EndTime { get; set; }
         [JsonProperty("s")]
         public string Symbol { get; set; }
         [JsonProperty("i")]

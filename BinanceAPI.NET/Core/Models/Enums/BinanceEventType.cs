@@ -1,6 +1,6 @@
 ﻿using BinanceAPI.NET.Core.Converters;
 using BinanceAPI.NET.Infrastructure.Attributes;
-using System.Text.Json.Serialization;
+using Newtonsoft.Json;
 
 namespace BinanceAPI.NET.Core.Models.Enums
 {
@@ -10,7 +10,7 @@ namespace BinanceAPI.NET.Core.Models.Enums
     {
         [StringValue("kline")]
         Kline,
-        [StringValue("value")]
-        value
+        [StringValue("24hrMiniTicker")]
+        TwentyFourHoursMiniTicker
     }
 }

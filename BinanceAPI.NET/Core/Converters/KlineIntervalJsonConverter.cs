@@ -21,14 +21,13 @@ namespace BinanceAPI.NET.Core.Converters
 
         public override KlineInterval ReadJson(JsonReader reader, Type objectType, KlineInterval existingValue,bool b, JsonSerializer serializer)
         {
-            switch (reader.Value)
+            foreach (var param in Enum.GetNames(typeof(KlineInterval)))
             {
-                case "15m":
-                    return KlineInterval.FifteenMinutes;
-
-                default:
-                    return KlineInterval.FiveMinutes;
+                var kline = Enum.Parse<KlineInterval>(param);
+                var str = kline.GetStringValue();
+                if (str == reader.Value.ToString()) return Enum.Parse<KlineInterval>(param);
             }
+            return KlineInterval.OneMinute;
         }
 
         public override bool CanRead
@@ -40,20 +39,5 @@ namespace BinanceAPI.NET.Core.Converters
         {
             return _types.Any(t => t == objectType);
         }
-        //public override bool CanConvert(Type typeToConvert)
-        //{
-        //    if (typeToConvert == typeof(KlineInterval)) return true;
-        //    return false;
-
-        //}
-        //public override KlineInterval Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-        //{
-        //    return JsonSerializer.Deserialize<KlineInterval>(reader.GetString());
-        //}
-
-        //public override void Write(Utf8JsonWriter writer, KlineInterval value, JsonSerializerOptions options)
-        //{
-        //    writer.WriteStringValue(value.GetStringValue());
-        //}
     }
 }

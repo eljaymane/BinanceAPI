@@ -17,6 +17,16 @@ namespace BinanceAPI.NET.Core.Models.Enums
         IndividualSymbolMiniTicker,
         [StringValue("@ticker")]
         IndividualSymbolTicker,
+        [StringValue("!miniTicker@arr")]
+        AllMarketMiniTicker,
+        [StringValue("!ticker@arr")]
+        AllMarketTicker,
+        [StringValue("@ticker_")]
+        IndividualRollingWindowStats,
+        [StringValue("!ticker_<param>@arr")]
+        AllMarketRollingWindowStats,
+        [StringValue("@bookTicker")]
+        IndividualBookTicker,
         [StringValue("@depth")]
         PartialBookDepth
 

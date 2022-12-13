@@ -64,9 +64,14 @@ var threadData = new Thread(async () =>
 {
     while (true) 
     {
-        var data = await client.KlineStream?.GetKlineDataAsync()!;
-        Console.WriteLine(data);
-        Thread.Sleep(4000);
+        try
+        {
+            var data = client.KlineStream?.GetKlineDataAsync().Result;
+            if(data != null) Console.WriteLine(data.HighPrice);
+        }
+        catch (Exception) { }
+        finally { Thread.Sleep(4000);  }
+        
     }
 
     

@@ -1,5 +1,4 @@
-﻿using BinanceAPI.NET.Core.Interfaces;
-using BinanceAPI.NET.Core.Models.Enums;
+﻿using BinanceAPI.NET.Core.Models.Enums;
 using BinanceAPI.NET.Core.Models.Socket;
 using BinanceAPI.NET.Infrastructure.Connectivity.Socket;
 using BinanceAPI.NET.Infrastructure.Connectivity.Socket.Configuration;
@@ -7,14 +6,14 @@ using BinanceAPI.NET.Infrastructure.Interfaces;
 using Microsoft.Extensions.Logging;
 using System.Text.Json;
 using System.Text;
-using BinanceAPI.NET.Core.Models;
-using BinanceAPI.NET.Core.Models.Streams.KlineCandlestick;
 using Newtonsoft.Json;
 
 namespace BinanceAPI.NET.Core.Abstractions
 {
     public abstract class AbstractBinanceStream<T>
     {
+        private ILoggerFactory _loggerFactory;
+        private CancellationTokenSource ctSource;
         public string? Name { get; set; }
         public BinanceStreamType StreamType { get; private set; }
         public IWebSocketService<BinanceWebSocketRequestMessage> Client { get; private set; }

@@ -3,26 +3,26 @@ using BinanceAPI.NET.Core.Models.Enums;
 using BinanceAPI.NET.Infrastructure.Interfaces;
 using Newtonsoft.Json;
 
-namespace BinanceAPI.NET.Core.Models.Streams.KlineCandlestick
+namespace BinanceAPI.NET.Core.Models.Socket
 {
     [Serializable]
-    public class BinanceWebSocketResponse<T> : IResponseDataType
+    public class BinanceWebSocketResponseMessage<T> : IResponseDataType
     {
         [JsonProperty("e")]
         public BinanceEventType EventType { get; set; }
-        [JsonProperty("E")]
-        public long EventTime { get; set; }
+        [JsonProperty("E"), JsonConverter(typeof(UnixTimestampDateConverter))]
+        public DateTime EventTime { get; set; }
         [JsonProperty("s")]
         public string Symbol { get; set; }
         [JsonProperty("k")]
         public T Data { get; set; }
 
-        public BinanceWebSocketResponse()
+        public BinanceWebSocketResponseMessage()
         {
 
         }
 
-        public BinanceWebSocketResponse(BinanceEventType eventType, long eventTime, string symbol,T data)
+        public BinanceWebSocketResponseMessage(BinanceEventType eventType, DateTime eventTime, string symbol, T data)
         {
             EventType = eventType;
             EventTime = eventTime;
