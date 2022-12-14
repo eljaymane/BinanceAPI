@@ -33,7 +33,7 @@ namespace BinanceAPI.NET.Core.Models.Objects
 
     }
     [Serializable]
-    public class BinanceWebSocketResponseMessage : IBinanceResponse
+    public class BinanceWebSocketResponseMessage : IBinanceResponse<IBinanceStreamData>
     {
         [JsonProperty("e")]
         public BinanceEventType EventType { get; set; }

@@ -50,7 +50,7 @@ namespace BinanceAPI.NET.Infrastructure.Connectivity.Socket
             return Task.FromResult(Encoding.UTF8.GetBytes(json));
         }
 
-        public override Task<IBinanceResponse?> Deserialize(byte[] message)
+        public override Task<IBinanceResponse<IBinanceStreamData>?> Deserialize(byte[] message)
         {
             throw new NotImplementedException();
         }

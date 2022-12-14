@@ -32,7 +32,8 @@ namespace BinanceAPI.NET.Infrastructure.Abstractions
 
         public abstract void Start();
         public abstract void SendRequestAsync(T request);
-        public abstract Task<IBinanceResponse?> Deserialize(byte[] message);
+        public abstract Task<IBinanceResponse<IBinanceStreamData>?> Deserialize(byte[] message);
         public abstract Task<byte[]> Serialize(T obj);
+
     }
 }

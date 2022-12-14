@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace BinanceAPI.NET.Core.Models.Objects.StreamData
 {
     [Serializable]
-    public class BinanceKlineCandlestickData : IBinanceResponse, IBinanceStreamData
+    public class BinanceKlineCandlestickData :  IBinanceStreamData
     {
         [JsonProperty("t"), JsonConverter(typeof(UnixTimestampDateConverter))]
         public DateTime StartTime { get; set; }
