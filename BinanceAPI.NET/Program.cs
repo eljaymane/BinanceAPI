@@ -1,6 +1,7 @@
 ﻿// See https://aka.ms/new-console-template for more information
 using BinanceAPI.NET.Core.Models;
 using BinanceAPI.NET.Core.Models.Enums;
+using BinanceAPI.NET.Core.Models.Objects.StreamData;
 using BinanceAPI.NET.Infrastructure.Connectivity.Socket.Configuration;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -58,16 +59,18 @@ var host = builder.Build();
 
 var configuration = new SocketConfiguration(new Uri("wss://stream.binance.com/ws"), true);
 BinanceMarketDataService client = new(loggerFactory,configuration,new CancellationTokenSource());
-client.KlineStream?.SubscribeAsync(KlineInterval.FifteenMinutes,"BTCBUSD");
-
+var t1 = new Thread(() => { client.KlineStream?.SubscribeAsync(KlineInterval.FifteenMinutes, "BTCBUSD"); });
+var t2 = new Thread(() => { client.RollingWindowStatsStream.SubscribeAsync("BTCBUSD"); });
+t1.Start();
+t2.Start();
 var threadData = new Thread(async () =>
 {
     while (true) 
     {
         try
         {
-            var data = client.KlineStream?.GetKlineDataAsync().Result;
-            if(data != null) Console.WriteLine(data.HighPrice);
+            BinanceRollingWindowStatsData data = (BinanceRollingWindowStatsData)client.RollingWindowStatsStream?.GetStreamData();
+            if(data != null) Console.WriteLine(data.LowPrice);
         }
         catch (Exception) { }
         finally { Thread.Sleep(4000);  }

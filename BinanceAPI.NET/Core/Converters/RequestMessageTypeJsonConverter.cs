@@ -28,7 +28,7 @@ namespace BinanceAPI.NET.Core.Converters
 
         public override void WriteJson(JsonWriter writer, BinanceRequestMessageType value, JsonSerializer serializer)
         {
-            writer.WriteRawValue(value.GetStringValue());
+            writer.WriteRawValue("\"" + value.GetStringValue() + "\"");
         }
     }
 }

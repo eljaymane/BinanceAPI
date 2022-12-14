@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace BinanceAPI.NET.Core.Models.Objects.StreamData
 {
     [Serializable]
-    public class BinanceMiniTickerData : IBinanceResponse, IBinanceStreamData
+    public class BinanceMiniTickerData : IBinanceStreamData
     {
         [JsonProperty("c")]
         public decimal ClosePrice { get; set; }

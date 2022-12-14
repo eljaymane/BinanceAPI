@@ -6,7 +6,7 @@ using Newtonsoft.Json;
 namespace BinanceAPI.NET.Core.Models.Objects
 {
     [Serializable]
-    public class BinanceWebSocketResponseMessage<T> : IBinanceResponse where T : IBinanceStreamData
+    public class BinanceWebSocketResponseMessage<T> where T : IBinanceStreamData
     {
         [JsonProperty("e")]
         public BinanceEventType EventType { get; set; }

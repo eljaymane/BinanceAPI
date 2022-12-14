@@ -23,15 +23,7 @@ namespace BinanceAPI.NET.Core.Models.Streams
         {
             var request = new BinanceWebSocketRequestMessage(0,
                 BinanceRequestMessageType.Subscribe, new string[] { symbol.ToLower() + StreamType.GetStringValue() + interval.GetStringValue() });
-            var serializerOptions = new JsonSerializerOptions
-            {
-                WriteIndented = true,
-                Converters =
-                {
-                    new RequestMessageTypeJsonConverter()
-                }
-            };
-            Client.SendRequestAsync(request, serializerOptions);
+            Client.SendRequestAsync(request);
         }
 
         public Task<BinanceKlineCandlestickData> GetKlineDataAsync()

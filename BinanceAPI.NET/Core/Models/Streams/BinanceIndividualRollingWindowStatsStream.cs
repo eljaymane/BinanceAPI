@@ -21,15 +21,7 @@ namespace BinanceAPI.NET.Core.Models.Streams
         {
             var request = new BinanceWebSocketRequestMessage(0,
                BinanceRequestMessageType.Subscribe, new string[] { symbol.ToLower() +  StreamType.GetStringValue()! + windowSize!.GetStringValue() });
-            var serializerOptions = new JsonSerializerOptions
-            {
-                WriteIndented = true,
-                Converters =
-                {
-                    new RequestMessageTypeJsonConverter()
-                }
-            };
-            Client.SendRequestAsync(request, serializerOptions);
+            Client.SendRequestAsync(request);
         }
         public override void Initialize()
         {
@@ -44,32 +36,27 @@ namespace BinanceAPI.NET.Core.Models.Streams
 
         public override void OnClose()
         {
-            throw new NotImplementedException();
         }
 
         public override void OnError(Exception exception)
         {
-            throw new NotImplementedException();
         }
 
         public override void OnMessage(byte[] streamData)
         {
-            throw new NotImplementedException();
+            base.OnMessage(streamData);
         }
 
         public override void OnOpen()
         {
-            throw new NotImplementedException();
         }
 
         public override void OnReconnected()
         {
-            throw new NotImplementedException();
         }
 
         public override void OnReconnecting()
         {
-            throw new NotImplementedException();
         }
     }
 }

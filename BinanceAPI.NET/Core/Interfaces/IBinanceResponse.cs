@@ -3,9 +3,9 @@ using Newtonsoft.Json;
 
 namespace BinanceAPI.NET.Core.Interfaces
 {
-    public interface IBinanceResponse : IBinanceStreamData
+    public interface IBinanceResponse<T> where T : IBinanceStreamData 
     {
-       
+        public T Data { get; set; }
 
     }
 }

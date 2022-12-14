@@ -3,6 +3,7 @@ using BinanceAPI.NET.Infrastructure.Abstractions;
 using BinanceAPI.NET.Infrastructure.Connectivity.Socket.Configuration;
 using BinanceAPI.NET.Infrastructure.Interfaces;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using System.Text;
 using System.Text.Json;
 
@@ -37,16 +38,16 @@ namespace BinanceAPI.NET.Infrastructure.Connectivity.Socket
 
      
 
-        public async override void SendRequestAsync(T request, JsonSerializerOptions? serializerOptions = null)
+        public async override void SendRequestAsync(T request)
         {
-            serializerOptions ??= new JsonSerializerOptions();
-            await Client.SendAsync(new ArraySegment<byte>(Serialize(request,serializerOptions).Result));
+            await Client.SendAsync(new ArraySegment<byte>(Serialize(request).Result));
         }
 
    
-        public override Task<byte[]> Serialize(T obj, JsonSerializerOptions serializerOptions)
+        public override Task<byte[]> Serialize(T obj)
         {
-            return Task.FromResult(Encoding.UTF8.GetBytes(JsonSerializer.Serialize<T>(obj, serializerOptions)));
+            var json = JsonConvert.SerializeObject(obj, IRequestDataType.GetSerialiazationSettings());
+            return Task.FromResult(Encoding.UTF8.GetBytes(json));
         }
 
         public override Task<IBinanceResponse?> Deserialize(byte[] message)

@@ -11,7 +11,7 @@ using BinanceAPI.NET.Core.Interfaces;
 
 namespace BinanceAPI.NET.Core.Abstractions
 {
-    public abstract class AbstractBinanceStream<T> where T : IBinanceStreamData
+    public abstract class AbstractBinanceStream<T> where T : IBinanceResponse<IBinanceStreamData>
     {
         private ILoggerFactory _loggerFactory;
         private CancellationTokenSource ctSource;
@@ -41,13 +41,13 @@ namespace BinanceAPI.NET.Core.Abstractions
 
         public virtual void OnMessage(byte[] streamData)
         {
-            data = Deserialize(streamData,IBinanceStreamData.GetSerializationSettings()).Result;
+            data = Deserialize(streamData,IBinanceStreamData.GetSerializationSettings()).Result.Data;
         }
 
         public virtual Task<T?> Deserialize(byte[] message,JsonSerializerSettings Options)
         {
             var json = Configuration.Encoding.GetString(message);
-            var obj = JsonConvert.DeserializeObject<T>(json,Options);
+            var obj = JsonConvert.DeserializeObject<T>(json,Options).D;
             
             return Task.FromResult(obj);
         }
@@ -62,5 +62,10 @@ namespace BinanceAPI.NET.Core.Abstractions
         public abstract void OnReconnecting();
 
         public abstract void OnReconnected();
+
+        public IBinanceStreamData GetStreamData()
+        {
+            return data;
+        }
     }
 }
