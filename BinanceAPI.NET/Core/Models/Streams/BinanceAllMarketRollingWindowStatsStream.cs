@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 
 namespace BinanceAPI.NET.Core.Models.Streams
 {
-    public class BinanceAllMarketRollingWindowStatsStream : AbstractBinanceStream<BinanceWebSocketResponseMessage<BinanceRollingWindowStatsData>>
+    public class BinanceAllMarketRollingWindowStatsStream : AbstractBinanceStream<BinanceRollingWindowStatsData>
     {
         public BinanceAllMarketRollingWindowStatsStream(SocketConfiguration configuration, ILoggerFactory loggerFactory, CancellationTokenSource ctSource) : base(BinanceStreamType.AllMarketRollingWindowStats, configuration, loggerFactory, ctSource)
         {

@@ -14,7 +14,6 @@ namespace BinanceAPI.NET.Core.Models.Objects
         public DateTime EventTime { get; set; }
         [JsonProperty("s")]
         public string Symbol { get; set; }
-        [JsonProperty("k")]
         public T Data { get; set; }
 
         public BinanceWebSocketResponseMessage()

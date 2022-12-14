@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace BinanceAPI.NET.Core.Models.Streams
 {
-    public class BinanceAllMarketMiniTickerStream : AbstractBinanceStream<BinanceWebSocketResponseMessage<BinanceMiniTickerData>>
+    public class BinanceAllMarketMiniTickerStream : AbstractBinanceStream<BinanceMiniTickerData>
     {
         public BinanceAllMarketMiniTickerStream(SocketConfiguration configuration, ILoggerFactory loggerFactory, CancellationTokenSource ctSource) : base(BinanceStreamType.AllMarketMiniTicker,configuration, loggerFactory, ctSource)
         {

@@ -10,7 +10,7 @@ using System.Text.Json;
 
 namespace BinanceAPI.NET.Core.Models.Streams
 {
-    public class BinanceIndividualRollingWindowStatsStream : AbstractBinanceStream<BinanceWebSocketResponseMessage<BinanceRollingWindowStatsData>>
+    public class BinanceIndividualRollingWindowStatsStream : AbstractBinanceStream<BinanceRollingWindowStatsData>
     {
         public BinanceIndividualRollingWindowStatsStream(SocketConfiguration configuration, ILoggerFactory loggerFactory, CancellationTokenSource ctSource) : base(BinanceStreamType.IndividualRollingWindowStats, configuration, loggerFactory, ctSource)
         {

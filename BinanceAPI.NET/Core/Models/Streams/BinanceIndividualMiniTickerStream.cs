@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace BinanceAPI.NET.Core.Models.Streams
 {
-    public class BinanceIndividualMiniTickerStream : AbstractBinanceStream<BinanceWebSocketResponseMessage<BinanceMiniTickerData>>
+    public class BinanceIndividualMiniTickerStream : AbstractBinanceStream<BinanceMiniTickerData>
     {
         public BinanceIndividualMiniTickerStream(SocketConfiguration configuration, ILoggerFactory loggerFactory, CancellationTokenSource tokenSource) : base(BinanceStreamType.IndividualSymbolTicker, configuration, loggerFactory, tokenSource)
         {
@@ -43,11 +43,7 @@ namespace BinanceAPI.NET.Core.Models.Streams
 
         public override void OnMessage(byte[] streamData)
         {
-            var serializerOptions = new JsonSerializerSettings
-            {
-                Converters = { new UnixTimestampDateConverter() },
-            };
-            data = Deserialize(streamData, serializerOptions).Result?.Data;
+            base.OnMessage(streamData);
         }
 
         public override void OnOpen()

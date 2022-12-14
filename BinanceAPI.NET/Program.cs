@@ -61,7 +61,7 @@ var configuration = new SocketConfiguration(new Uri("wss://stream.binance.com/ws
 BinanceMarketDataService client = new(loggerFactory,configuration,new CancellationTokenSource());
 var t1 = new Thread(() => { client.KlineStream?.SubscribeAsync(KlineInterval.FifteenMinutes, "BTCBUSD"); });
 var t2 = new Thread(() => { client.RollingWindowStatsStream.SubscribeAsync("BTCBUSD"); });
-t1.Start();
+//t1.Start();
 t2.Start();
 var threadData = new Thread(async () =>
 {

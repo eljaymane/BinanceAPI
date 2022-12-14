@@ -12,7 +12,8 @@ namespace BinanceAPI.NET.Core.Converters
     {
         public override DateTime ReadJson(JsonReader reader, Type objectType, DateTime existingValue, bool hasExistingValue, JsonSerializer serializer)
         {
-            return Calculation.EpochToDate((long)reader.Value);
+            var date = Calculation.EpochToDate((long)reader.Value);
+            return date;
         }
 
         public override void WriteJson(JsonWriter writer, DateTime value, JsonSerializer serializer)

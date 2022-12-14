@@ -12,7 +12,7 @@ using System.Text.Json;
 
 namespace BinanceAPI.NET.Core.Models.Streams
 {
-    public class BinanceKlineCandlestickStream : AbstractBinanceStream<BinanceWebSocketResponseMessage<BinanceKlineCandlestickData>>
+    public class BinanceKlineCandlestickStream : AbstractBinanceStream<BinanceKlineCandlestickData>
     {
         public BinanceKlineCandlestickStream(ILoggerFactory loggerFactory, SocketConfiguration configuration, CancellationTokenSource tokenSource) : base(BinanceStreamType.KlineCandlestick, configuration, loggerFactory, tokenSource)
         {
@@ -59,11 +59,7 @@ namespace BinanceAPI.NET.Core.Models.Streams
 
         public override void OnMessage(byte[] streamData)
         {
-            var serializerOptions = new JsonSerializerSettings
-            {
-                Converters = { new KlineIntervalJsonConverter(), new UnixTimestampDateConverter() },
-            };
-            data = Deserialize(streamData, serializerOptions).Result?.Data;
+           base.OnMessage(streamData);
         }
 
         public override void OnReconnecting()

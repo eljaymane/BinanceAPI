@@ -1,17 +1,17 @@
-﻿using BinanceAPI.NET.Core.Models.Enums;
+﻿using BinanceAPI.NET.Core.Interfaces;
+using BinanceAPI.NET.Core.Models.Enums;
+using BinanceAPI.NET.Core.Models.Objects;
 using BinanceAPI.NET.Infrastructure.Connectivity.Socket;
 using BinanceAPI.NET.Infrastructure.Connectivity.Socket.Configuration;
 using BinanceAPI.NET.Infrastructure.Interfaces;
 using Microsoft.Extensions.Logging;
-using System.Text.Json;
-using System.Text;
 using Newtonsoft.Json;
-using BinanceAPI.NET.Core.Models.Objects;
-using BinanceAPI.NET.Core.Interfaces;
+using System.Text;
+using System.Text.Json;
 
 namespace BinanceAPI.NET.Core.Abstractions
 {
-    public abstract class AbstractBinanceStream<T>
+    public abstract class AbstractBinanceStream<T> where T : IBinanceStreamData
     {
         private ILoggerFactory _loggerFactory;
         private CancellationTokenSource ctSource;
@@ -21,7 +21,7 @@ namespace BinanceAPI.NET.Core.Abstractions
         public SocketConfiguration Configuration { get; private set; }
 
         internal SemaphoreSlim dataSem = new SemaphoreSlim(1,1);
-        internal IBinanceStreamData? data { get; set; }
+        internal T data { get; set; }
 
         public AbstractBinanceStream(BinanceStreamType streamType,SocketConfiguration configuration,ILoggerFactory loggerFactory,CancellationTokenSource ctSource)
         {
@@ -41,14 +41,14 @@ namespace BinanceAPI.NET.Core.Abstractions
 
         public virtual void OnMessage(byte[] streamData)
         {
-            data = Deserialize(streamData,IBinanceStreamData.GetSerializationSettings()).Result.Data;
+            data = Deserialize(streamData,IBinanceStreamData.GetSerializationSettings()).Result;
         }
 
-        public virtual Task<IBinanceResponse<IBinanceStreamData>?> Deserialize(byte[] message,JsonSerializerSettings Options)
+        public virtual Task<T?> Deserialize(byte[] message,JsonSerializerSettings Options)
         {
             var json = Configuration.Encoding.GetString(message);
-            var obj = (IBinanceResponse<IBinanceStreamData>)JsonConvert.DeserializeObject<T>(json,Options);
-            
+            var ob = JsonConvert.DeserializeObject<BinanceWebSocketResponseMessage<T>>(json,Options);
+             var obj = ob.Data;
             return Task.FromResult(obj);
         }
 
@@ -63,7 +63,7 @@ namespace BinanceAPI.NET.Core.Abstractions
 
         public abstract void OnReconnected();
 
-        public IBinanceStreamData GetStreamData()
+        public T GetStreamData()
         {
             return data;
         }

@@ -18,7 +18,7 @@ using System.Threading.Tasks;
 
 namespace BinanceAPI.NET.Core.Models.Streams
 {
-    public class BinanceIndividualSymbolTickerStream : AbstractBinanceStream<BinanceWebSocketResponseMessage<BinanceTickerData>>
+    public class BinanceIndividualSymbolTickerStream : AbstractBinanceStream<BinanceTickerData>
     {
         public BinanceIndividualSymbolTickerStream(SocketConfiguration configuration, ILoggerFactory loggerFactory, CancellationTokenSource tokenSource) : base(BinanceStreamType.IndividualSymbolTicker,configuration,loggerFactory,tokenSource)
         {
