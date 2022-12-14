@@ -1,7 +1,6 @@
 ﻿using BinanceAPI.NET.Core.Converters;
 using BinanceAPI.NET.Core.Interfaces;
 using BinanceAPI.NET.Core.Models.Enums;
-using BinanceAPI.NET.Infrastructure.Interfaces;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -12,7 +11,7 @@ using System.Threading.Tasks;
 namespace BinanceAPI.NET.Core.Models.Objects.StreamData
 {
     [Serializable]
-    public class BinanceKlineCandlestickData : IResponseDataType, IBinanceStreamData
+    public class BinanceKlineCandlestickData : IBinanceResponse, IBinanceStreamData
     {
         [JsonProperty("t"), JsonConverter(typeof(UnixTimestampDateConverter))]
         public DateTime StartTime { get; set; }

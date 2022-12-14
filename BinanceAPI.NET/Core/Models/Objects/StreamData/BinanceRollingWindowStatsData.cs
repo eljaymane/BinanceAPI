@@ -1,9 +1,10 @@
-﻿using Newtonsoft.Json;
+﻿using BinanceAPI.NET.Core.Interfaces;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
 namespace BinanceAPI.NET.Core.Models.Objects.StreamData
 {
-    public class BinanceRollingWindowStatsData
+    public class BinanceRollingWindowStatsData : IBinanceResponse
     {
         [JsonProperty("p")]
         public decimal PriceChange { get; set; }

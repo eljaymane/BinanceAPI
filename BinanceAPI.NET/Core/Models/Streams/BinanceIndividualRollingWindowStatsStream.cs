@@ -1,8 +1,8 @@
 ﻿using BinanceAPI.NET.Core.Abstractions;
 using BinanceAPI.NET.Core.Converters;
 using BinanceAPI.NET.Core.Models.Enums;
+using BinanceAPI.NET.Core.Models.Objects;
 using BinanceAPI.NET.Core.Models.Objects.StreamData;
-using BinanceAPI.NET.Core.Models.Socket;
 using BinanceAPI.NET.Infrastructure.Connectivity.Socket.Configuration;
 using BinanceAPI.NET.Infrastructure.Extensions;
 using Microsoft.Extensions.Logging;

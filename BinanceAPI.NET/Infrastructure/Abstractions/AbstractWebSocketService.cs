@@ -1,4 +1,5 @@
-﻿using BinanceAPI.NET.Infrastructure.Connectivity.Socket;
+﻿using BinanceAPI.NET.Core.Interfaces;
+using BinanceAPI.NET.Infrastructure.Connectivity.Socket;
 using BinanceAPI.NET.Infrastructure.Connectivity.Socket.Configuration;
 using BinanceAPI.NET.Infrastructure.Interfaces;
 using Microsoft.Extensions.Logging;
@@ -30,8 +31,8 @@ namespace BinanceAPI.NET.Infrastructure.Abstractions
         }
 
         public abstract void Start();
-        public abstract void SendRequestAsync(T request, JsonSerializerOptions? serializerOptions = null);
-        public abstract Task<IResponseDataType?> Deserialize(byte[] message);
-        public abstract Task<byte[]> Serialize(T obj, JsonSerializerOptions serializerOptions);
+        public abstract void SendRequestAsync(T request);
+        public abstract Task<IBinanceResponse?> Deserialize(byte[] message);
+        public abstract Task<byte[]> Serialize(T obj);
     }
 }

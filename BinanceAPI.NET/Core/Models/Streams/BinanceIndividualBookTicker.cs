@@ -1,6 +1,7 @@
 ﻿using BinanceAPI.NET.Core.Abstractions;
 using BinanceAPI.NET.Core.Converters;
 using BinanceAPI.NET.Core.Models.Enums;
+using BinanceAPI.NET.Core.Models.Objects;
 using BinanceAPI.NET.Core.Models.Objects.StreamData;
 using BinanceAPI.NET.Core.Models.Socket;
 using BinanceAPI.NET.Infrastructure.Connectivity.Socket.Configuration;
@@ -26,15 +27,7 @@ namespace BinanceAPI.NET.Core.Models.Streams
         {
             var request = new BinanceWebSocketRequestMessage(0,
                 BinanceRequestMessageType.Subscribe, new string[] { symbol.ToLower() + StreamType.GetStringValue() });
-            var serializerOptions = new JsonSerializerOptions
-            {
-                WriteIndented = true,
-                Converters =
-                {
-                    new RequestMessageTypeJsonConverter()
-                }
-            };
-            Client.SendRequestAsync(request, serializerOptions);
+            Client.SendRequestAsync(request);
         }
         public override void Initialize()
         {

@@ -3,7 +3,6 @@ using BinanceAPI.NET.Core.Converters;
 using BinanceAPI.NET.Core.Models.Enums;
 using BinanceAPI.NET.Core.Models.Objects;
 using BinanceAPI.NET.Core.Models.Objects.StreamData;
-using BinanceAPI.NET.Core.Models.Socket;
 using BinanceAPI.NET.Infrastructure.Abstractions;
 using BinanceAPI.NET.Infrastructure.Connectivity.Socket;
 using BinanceAPI.NET.Infrastructure.Connectivity.Socket.Configuration;
@@ -64,11 +63,7 @@ namespace BinanceAPI.NET.Core.Models.Streams
 
         public override void OnMessage(byte[] streamData)
         {
-            var serializerOptions = new JsonSerializerSettings
-            {
-                Converters = { new UnixTimestampDateConverter() },
-            };
-            data = Deserialize(streamData, serializerOptions).Result.Data;
+           base.OnMessage(streamData);
         }
 
         public override void OnOpen()

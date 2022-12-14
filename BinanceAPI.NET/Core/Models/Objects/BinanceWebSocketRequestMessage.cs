@@ -5,7 +5,7 @@ using BinanceAPI.NET.Infrastructure.Interfaces;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace BinanceAPI.NET.Core.Models.Socket
+namespace BinanceAPI.NET.Core.Models.Objects
 {
     [Serializable]
     public class BinanceWebSocketRequestMessage : IBinanceRequest, IRequestDataType
@@ -21,7 +21,7 @@ namespace BinanceAPI.NET.Core.Models.Socket
         {
 
         }
-        public BinanceWebSocketRequestMessage(uint id,BinanceRequestMessageType messageType, string[] parameters) 
+        public BinanceWebSocketRequestMessage(uint id, BinanceRequestMessageType messageType, string[] parameters)
         {
             Id = id;
             MessageType = messageType;

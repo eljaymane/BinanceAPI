@@ -1,8 +1,17 @@
-﻿using BinanceAPI.NET.Infrastructure.Interfaces;
+﻿using BinanceAPI.NET.Core.Converters;
+using Newtonsoft.Json;
 
 namespace BinanceAPI.NET.Core.Interfaces
 {
-    public interface IBinanceStreamData : IResponseDataType
+    public interface IBinanceStreamData 
     {
+        public static JsonSerializerSettings GetSerializationSettings()
+        {
+            var serializationSettings = new JsonSerializerSettings
+            {
+                Converters = { new UnixTimestampDateConverter(), new KlineIntervalJsonConverter(), new BinanceEventTypeConverter(), new BinanceStatisticsRollingWindowSizeConverter() }
+            };
+            return serializationSettings;
+        }
     }
 }

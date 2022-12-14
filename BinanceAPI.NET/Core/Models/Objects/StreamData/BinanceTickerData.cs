@@ -1,12 +1,11 @@
 ﻿using BinanceAPI.NET.Core.Interfaces;
-using BinanceAPI.NET.Infrastructure.Interfaces;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
 namespace BinanceAPI.NET.Core.Models.Objects.StreamData
 {
     [Serializable]
-    public class BinanceTickerData : IResponseDataType, IBinanceStreamData
+    public class BinanceTickerData : IBinanceResponse, IBinanceStreamData
     {
         [JsonProperty("p")]
         public decimal PriceChange { get; set; }

@@ -8,6 +8,10 @@ namespace BinanceAPI.NET.Core.Converters
     {
         private readonly Type[] _types;
 
+        public BinanceEventTypeConverter()
+        {
+
+        }
         public BinanceEventTypeConverter(params Type[] types)
         {
             _types = types;

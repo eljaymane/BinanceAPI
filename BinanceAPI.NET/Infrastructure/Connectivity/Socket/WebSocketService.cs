@@ -1,15 +1,10 @@
-﻿using BinanceAPI.NET.Infrastructure.Abstractions;
+﻿using BinanceAPI.NET.Core.Interfaces;
+using BinanceAPI.NET.Infrastructure.Abstractions;
 using BinanceAPI.NET.Infrastructure.Connectivity.Socket.Configuration;
 using BinanceAPI.NET.Infrastructure.Interfaces;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
-using System.Xml.Serialization;
 
 namespace BinanceAPI.NET.Infrastructure.Connectivity.Socket
 {
@@ -54,7 +49,7 @@ namespace BinanceAPI.NET.Infrastructure.Connectivity.Socket
             return Task.FromResult(Encoding.UTF8.GetBytes(JsonSerializer.Serialize<T>(obj, serializerOptions)));
         }
 
-        public override Task<IResponseDataType?> Deserialize(byte[] message)
+        public override Task<IBinanceResponse?> Deserialize(byte[] message)
         {
             throw new NotImplementedException();
         }

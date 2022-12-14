@@ -1,4 +1,5 @@
 ﻿using BinanceAPI.NET.Core.Converters;
+using BinanceAPI.NET.Core.Models.Objects;
 using BinanceAPI.NET.Infrastructure.Connectivity.Socket;
 using BinanceAPI.NET.Infrastructure.Connectivity.Socket.Configuration;
 using Microsoft.Extensions.Logging;

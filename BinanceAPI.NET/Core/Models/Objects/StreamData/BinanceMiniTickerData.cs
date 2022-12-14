@@ -1,5 +1,4 @@
 ﻿using BinanceAPI.NET.Core.Interfaces;
-using BinanceAPI.NET.Infrastructure.Interfaces;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -10,7 +9,7 @@ using System.Threading.Tasks;
 namespace BinanceAPI.NET.Core.Models.Objects.StreamData
 {
     [Serializable]
-    public class BinanceMiniTickerData : IResponseDataType, IBinanceStreamData
+    public class BinanceMiniTickerData : IBinanceResponse, IBinanceStreamData
     {
         [JsonProperty("c")]
         public decimal ClosePrice { get; set; }
