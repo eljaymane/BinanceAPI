@@ -3,10 +3,10 @@ using BinanceAPI.NET.Core.Interfaces;
 using BinanceAPI.NET.Core.Models.Enums;
 using Newtonsoft.Json;
 
-namespace BinanceAPI.NET.Core.Models.Objects
+namespace BinanceAPI.NET.Core.Models.Objects.StreamData
 {
     [Serializable]
-    public class BinanceWebSocketResponseMessage<T> where T : IBinanceStreamData
+    public class BinanceStreamData : IBinanceStreamData
     {
         [JsonProperty("e")]
         public BinanceEventType EventType { get; set; }
@@ -14,25 +14,24 @@ namespace BinanceAPI.NET.Core.Models.Objects
         public DateTime EventTime { get; set; }
         [JsonProperty("s")]
         public string Symbol { get; set; }
-        public T Data { get; set; }
 
-        public BinanceWebSocketResponseMessage()
+
+        public BinanceStreamData()
         {
 
         }
 
-        public BinanceWebSocketResponseMessage(BinanceEventType eventType, DateTime eventTime, string symbol, T data)
+        public BinanceStreamData(BinanceEventType eventType, DateTime eventTime, string symbol)
         {
             EventType = eventType;
             EventTime = eventTime;
             Symbol = symbol;
-            Data = data;
         }
 
 
     }
     [Serializable]
-    public class BinanceWebSocketResponseMessage : IBinanceResponse<IBinanceStreamData>
+    public class BinanceStreamData<T> : IBinanceStreamData
     {
         [JsonProperty("e")]
         public BinanceEventType EventType { get; set; }
@@ -41,21 +40,11 @@ namespace BinanceAPI.NET.Core.Models.Objects
         [JsonProperty("s")]
         public string Symbol { get; set; }
         [JsonProperty("k")]
-        public IBinanceStreamData Data { get; set; }
+        public T Data { get; set; }
 
-        public BinanceWebSocketResponseMessage()
+        public BinanceStreamData()
         {
 
         }
-
-        public BinanceWebSocketResponseMessage(BinanceEventType eventType, DateTime eventTime, string symbol, IBinanceStreamData data)
-        {
-            EventType = eventType;
-            EventTime = eventTime;
-            Symbol = symbol;
-            Data = data;
-        }
-
-
     }
 }

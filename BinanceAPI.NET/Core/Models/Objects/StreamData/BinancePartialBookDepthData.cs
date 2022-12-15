@@ -2,7 +2,7 @@
 
 namespace BinanceAPI.NET.Core.Models.Objects.StreamData
 {
-    public class BinancePartialBookDepthData : IBinanceStreamData
+    public class BinancePartialBookDepthData : BinanceStreamData
     {
     }
 }

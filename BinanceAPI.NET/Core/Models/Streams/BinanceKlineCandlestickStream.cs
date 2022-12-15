@@ -3,6 +3,7 @@ using BinanceAPI.NET.Core.Converters;
 using BinanceAPI.NET.Core.Interfaces;
 using BinanceAPI.NET.Core.Models.Enums;
 using BinanceAPI.NET.Core.Models.Objects;
+using BinanceAPI.NET.Core.Models.Objects.Entities;
 using BinanceAPI.NET.Core.Models.Objects.StreamData;
 using BinanceAPI.NET.Infrastructure.Connectivity.Socket.Configuration;
 using BinanceAPI.NET.Infrastructure.Extensions;
@@ -29,7 +30,7 @@ namespace BinanceAPI.NET.Core.Models.Streams
         public Task<BinanceKlineCandlestickData> GetKlineDataAsync()
         {
             //dataSem.Wait();
-            return Task.FromResult((BinanceKlineCandlestickData)data);
+            return Task.FromResult(data);
         }
         public override void Initialize()
         {

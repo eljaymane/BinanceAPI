@@ -1,11 +1,12 @@
-﻿using BinanceAPI.NET.Core.Interfaces;
+﻿using BinanceAPI.NET.Core.Converters;
+using BinanceAPI.NET.Core.Interfaces;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
 namespace BinanceAPI.NET.Core.Models.Objects.StreamData
 {
     [Serializable]
-    public class BinanceRollingWindowStatsData : IBinanceStreamData
+    public class BinanceRollingWindowStatsData : BinanceStreamData
     {
         [JsonProperty("p")]
         public double PriceChange { get; set; }
@@ -25,9 +26,9 @@ namespace BinanceAPI.NET.Core.Models.Objects.StreamData
         public double TotalTradedBaseAssetVol { get; set; }
         [JsonProperty("q")]
         public double TotalTradedQuoteAssetVol { get; set; }
-        [JsonProperty("O"), JsonConverter(typeof(UnixDateTimeConverter))]
+        [JsonProperty("O"), JsonConverter(typeof(UnixTimestampDateConverter))]
         public DateTime StatsOpenTime { get; set; }
-        [JsonProperty("C"), JsonConverter(typeof(UnixDateTimeConverter))]
+        [JsonProperty("C"), JsonConverter(typeof(UnixTimestampDateConverter))]
         public DateTime StatsCloseTime { get; set; }
         [JsonProperty("F")]
         public long FirstTradeId { get; set; }

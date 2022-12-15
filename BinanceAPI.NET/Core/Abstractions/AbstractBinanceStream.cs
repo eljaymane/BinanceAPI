@@ -6,6 +6,7 @@ using BinanceAPI.NET.Infrastructure.Connectivity.Socket.Configuration;
 using BinanceAPI.NET.Infrastructure.Interfaces;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using System.IO;
 using System.Text;
 using System.Text.Json;
 
@@ -13,6 +14,7 @@ namespace BinanceAPI.NET.Core.Abstractions
 {
     public abstract class AbstractBinanceStream<T> where T : IBinanceStreamData
     {
+        private uint lastRequestId = 0;
         private ILoggerFactory _loggerFactory;
         private CancellationTokenSource ctSource;
         public string? Name { get; set; }
@@ -28,6 +30,34 @@ namespace BinanceAPI.NET.Core.Abstractions
             StreamType = streamType;
             Client = new WebSocketService<BinanceWebSocketRequestMessage>(configuration, loggerFactory, ctSource);
             Configuration = configuration;
+        }
+
+        public Task SubscribeAsync(string[] streams)
+        {
+            var request = new BinanceWebSocketRequestMessage(NextId(),BinanceRequestMessageType.Subscribe, streams);
+            Client.SendRequestAsync(request);
+            return Task.CompletedTask;
+        }
+
+        public Task SubscribeAsync(string stream)
+        {
+            var request = new BinanceWebSocketRequestMessage(NextId(), BinanceRequestMessageType.Subscribe, new string[] {stream});
+            Client.SendRequestAsync(request);
+            return Task.CompletedTask;
+        }
+
+        public Task UnSubscribe(string stream)
+        {
+            var request = new BinanceWebSocketRequestMessage(NextId(), BinanceRequestMessageType.Unsubscribe, new string[] { stream });
+            Client.SendRequestAsync(request);
+            return Task.CompletedTask;
+        }
+
+        public Task ListSubscriptions()
+        {
+            var request = new BinanceWebSocketRequestMessage(NextId(), BinanceRequestMessageType.ListSubscriptions, new string[] { "" });
+            Client.SendRequestAsync(request);
+            return Task.CompletedTask;
         }
 
 
@@ -47,8 +77,7 @@ namespace BinanceAPI.NET.Core.Abstractions
         public virtual Task<T?> Deserialize(byte[] message,JsonSerializerSettings Options)
         {
             var json = Configuration.Encoding.GetString(message);
-            var ob = JsonConvert.DeserializeObject<BinanceWebSocketResponseMessage<T>>(json,Options);
-             var obj = ob.Data;
+            var obj = JsonConvert.DeserializeObject<T>(json,Options);
             return Task.FromResult(obj);
         }
 
@@ -66,6 +95,11 @@ namespace BinanceAPI.NET.Core.Abstractions
         public T GetStreamData()
         {
             return data;
+        }
+
+        public uint NextId()
+        {
+            return lastRequestId++;
         }
     }
 }

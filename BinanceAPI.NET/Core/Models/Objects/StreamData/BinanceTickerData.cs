@@ -5,7 +5,7 @@ using Newtonsoft.Json.Converters;
 namespace BinanceAPI.NET.Core.Models.Objects.StreamData
 {
     [Serializable]
-    public class BinanceTickerData :  IBinanceStreamData
+    public class BinanceTickerData :  BinanceStreamData
     {
         [JsonProperty("p")]
         public decimal PriceChange { get; set; }

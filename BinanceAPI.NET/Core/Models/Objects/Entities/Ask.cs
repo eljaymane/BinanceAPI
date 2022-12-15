@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BinanceAPI.NET.Core.Models.Objects
+namespace BinanceAPI.NET.Core.Models.Objects.Entities
 {
-    public class Bid
+    public class Ask
     {
         public decimal Price { get; set; }
         public decimal Quantity { get; set; }

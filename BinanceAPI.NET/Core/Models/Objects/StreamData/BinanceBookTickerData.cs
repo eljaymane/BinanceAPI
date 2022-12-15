@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 namespace BinanceAPI.NET.Core.Models.Objects.StreamData
 {
     [Serializable]
-    public class BinanceBookTickerData : IBinanceStreamData
+    public class BinanceBookTickerData : BinanceStreamData
     {
         [JsonProperty("u")]
         public long OrderBookUpdateId { get; set; }
