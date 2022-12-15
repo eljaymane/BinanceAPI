@@ -24,6 +24,14 @@ namespace BinanceAPI.NET.Core.Models
         public ISocketConfiguration Configuration { get; set; }
         public ConcurrentDictionary<BinanceStreamType, Dictionary<string,IBinanceStreamData>> StreamData = new();
         public BinanceKlineCandlestickStream KlineCandlestickStream { get; set; }
+        public BinanceTickerStream TickerStream { get; set; }
+        public BinanceMiniTickerStream MiniTickerStream { get; set; }
+        public BinanceBookTickerStream BookTickerStream { get; set; }
+        public BinancePartialBookDepthStream PartialBookDepthStream { get; set; }
+        public BinanceRollingWindowStatsStream RollingWindowStatsStream { get; set; }
+        public BinanceTradeStream TradeStream { get; set; }
+        public BinanceAggregateTradeStream AggregateTradeStream { get; set; }
+
         private IWebSocketService<BinanceWebSocketRequestMessage> Client { get; set; }
         private uint lastRequestId = 0;
 
@@ -73,11 +81,20 @@ namespace BinanceAPI.NET.Core.Models
             Client.OnReconnecting += OnReconnecting;
             Client.OnMessage += OnMessage;
             Client.OnOpen += OnOpen;
+            
+            KlineCandlestickStream = new (this);
+            TickerStream = new (this);
+            MiniTickerStream= new (this);
+            BookTickerStream= new (this);
+            PartialBookDepthStream= new(this);
+            RollingWindowStatsStream= new(this);
+            TradeStream= new(this);
+            AggregateTradeStream= new(this);
+
             var socket = new Thread(() => {
                 Client.Start();
             });
             socket.Start();
-            KlineCandlestickStream = new (this);
         }
         public void OnError(Exception exception)
         {
@@ -105,8 +122,11 @@ namespace BinanceAPI.NET.Core.Models
             {
                 case BinanceEventType.Kline:
                     var data = (BinanceKlineCandlestickData)JsonConvert.DeserializeObject<BinanceKlineCandlestickData>(Configuration.Encoding.GetString(streamData),IBinanceStreamData.GetSerializationSettings());
-                    GetStreamData(BinanceStreamType.KlineCandlestick).Remove(data.Symbol);
-                    GetStreamData(BinanceStreamType.KlineCandlestick).Add(data.Symbol, data);
+                    if(data.Symbol != null)
+                    {
+                        GetStreamData(BinanceStreamType.KlineCandlestick).Remove(data.Symbol);
+                        GetStreamData(BinanceStreamType.KlineCandlestick).Add(data.Symbol, data);
+                    }
                         break;
             }
         }

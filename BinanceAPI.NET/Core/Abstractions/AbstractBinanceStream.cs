@@ -29,9 +29,10 @@ namespace BinanceAPI.NET.Core.Abstractions
         {
             Client = client;
             StreamType = streamType;
+            CreateDataStore();
         }
 
-        internal void CreateDataStore()
+        private void CreateDataStore()
         {
             if (!Client.StreamData.ContainsKey(StreamType)) Client.StreamData.TryAdd(StreamType, new Dictionary<string, IBinanceStreamData>());
         }

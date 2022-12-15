@@ -28,7 +28,9 @@ namespace BinanceAPI.NET.Core.Models.Enums
         [StringValue("@bookTicker")]
         IndividualBookTicker,
         [StringValue("@depth")]
-        PartialBookDepth
+        PartialBookDepth,
+        [StringValue("@trade")]
+        Trade
 
     }
 }

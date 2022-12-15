@@ -10,17 +10,15 @@ using System.Text.Json;
 
 namespace BinanceAPI.NET.Core.Models.Streams
 {
-    public class BinanceIndividualRollingWindowStatsStream : AbstractBinanceStream<BinanceRollingWindowStatsData>
+    public class BinanceRollingWindowStatsStream : AbstractBinanceStream<BinanceRollingWindowStatsData>
     {
-        public BinanceIndividualRollingWindowStatsStream(ref BinanceMarketDataService client) : base(ref client, BinanceStreamType.IndividualRollingWindowStats)
+        public BinanceRollingWindowStatsStream(BinanceMarketDataService client) : base(ref client, BinanceStreamType.IndividualRollingWindowStats)
         {
         }
 
         public void SubscribeAsync(string symbol, BinanceStatisticsRollingWindowSize? windowSize = BinanceStatisticsRollingWindowSize.OneHour)
         {
-            var request = new BinanceWebSocketRequestMessage(0,
-               BinanceRequestMessageType.Subscribe, new string[] { symbol.ToLower() +  StreamType.GetStringValue()! + windowSize!.GetStringValue() });
-            //Client.SendRequestAsync(request);
+            Client.SubscribeAsync(symbol.ToLower() + StreamType.GetStringValue()! + windowSize!.GetStringValue());
         }
        
     }

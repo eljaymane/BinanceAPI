@@ -21,15 +21,8 @@ namespace BinanceAPI.NET.Core.Models.Streams
 
         public void Subscribe(KlineInterval interval, string symbol)
         {
-            CreateDataStore();
             Client.SubscribeAsync(symbol.ToLower() + StreamType.GetStringValue() + interval.GetStringValue());
         }
 
-        public Task<BinanceKlineCandlestickData> GetKlineDataAsync()
-        {
-            //dataSem.Wait();
-            return Task.FromResult(data);
-        }
-       
     }
 }
