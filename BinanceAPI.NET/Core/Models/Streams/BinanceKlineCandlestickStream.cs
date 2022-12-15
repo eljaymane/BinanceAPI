@@ -15,16 +15,14 @@ namespace BinanceAPI.NET.Core.Models.Streams
 {
     public class BinanceKlineCandlestickStream : AbstractBinanceStream<BinanceKlineCandlestickData>
     {
-        public BinanceKlineCandlestickStream(ILoggerFactory loggerFactory, SocketConfiguration configuration, CancellationTokenSource tokenSource) : base(BinanceStreamType.KlineCandlestick, configuration, loggerFactory, tokenSource)
+        public BinanceKlineCandlestickStream(BinanceMarketDataService client) : base(ref client,BinanceStreamType.KlineCandlestick)
         {
-            Initialize();
         }
 
-        public void SubscribeAsync(KlineInterval interval, string symbol)
+        public void Subscribe(KlineInterval interval, string symbol)
         {
-            var request = new BinanceWebSocketRequestMessage(0,
-                BinanceRequestMessageType.Subscribe, new string[] { symbol.ToLower() + StreamType.GetStringValue() + interval.GetStringValue() });
-            Client.SendRequestAsync(request);
+            CreateDataStore();
+            Client.SubscribeAsync(symbol.ToLower() + StreamType.GetStringValue() + interval.GetStringValue());
         }
 
         public Task<BinanceKlineCandlestickData> GetKlineDataAsync()
@@ -32,45 +30,6 @@ namespace BinanceAPI.NET.Core.Models.Streams
             //dataSem.Wait();
             return Task.FromResult(data);
         }
-        public override void Initialize()
-        {
-            Client.OnError += OnError;
-            Client.OnClose += OnClose;
-            Client.OnReconnected += OnReconnected;
-            Client.OnReconnecting += OnReconnecting;
-            Client.OnMessage += OnMessage;
-            Client.OnOpen += OnOpen;
-            Client.Start();
-        }
-
-        public override void OnError(Exception exception)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void OnClose()
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void OnOpen()
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void OnMessage(byte[] streamData)
-        {
-           base.OnMessage(streamData);
-        }
-
-        public override void OnReconnecting()
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void OnReconnected()
-        {
-            throw new NotImplementedException();
-        }
+       
     }
 }

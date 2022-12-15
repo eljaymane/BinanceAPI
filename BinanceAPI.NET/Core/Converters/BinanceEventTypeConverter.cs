@@ -29,7 +29,7 @@ namespace BinanceAPI.NET.Core.Converters
             {
                 var kline = Enum.Parse<BinanceEventType>(param);
                 var str = kline.GetStringValue();
-                if (str == reader.Value.ToString()) return Enum.Parse<BinanceEventType>(param);
+                if (str == reader?.Value!.ToString()) return Enum.Parse<BinanceEventType>(param);
             }
             return BinanceEventType.Kline;
         }

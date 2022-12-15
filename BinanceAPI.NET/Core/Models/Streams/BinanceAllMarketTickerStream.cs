@@ -17,55 +17,15 @@ namespace BinanceAPI.NET.Core.Models.Streams
 {
     public class BinanceAllMarketTickerStream : AbstractBinanceStream<BinanceTickerData>
     {
-        public BinanceAllMarketTickerStream(SocketConfiguration configuration, ILoggerFactory loggerFactory, CancellationTokenSource ctSource) : base(BinanceStreamType.AllMarketTicker,configuration,loggerFactory,ctSource)
+        public BinanceAllMarketTickerStream(ref BinanceMarketDataService client) : base(ref client, BinanceStreamType.AllMarketTicker)
         {
-            Initialize();
         }
         public void SubscribeAsync()
         {
             var request = new BinanceWebSocketRequestMessage(0,
                 BinanceRequestMessageType.Subscribe, new string[] { StreamType.GetStringValue()! });
-            Client.SendRequestAsync(request);
+            //Client.SendRequestAsync(request);
         }
-        public override void Initialize()
-        {
-            Client.OnError += OnError;
-            Client.OnClose += OnClose;
-            Client.OnReconnected += OnReconnected;
-            Client.OnReconnecting += OnReconnecting;
-            Client.OnMessage += OnMessage;
-            Client.OnOpen += OnOpen;
-            Client.Start();
-        }
-
-        public override void OnClose()
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void OnError(Exception exception)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void OnMessage(byte[] streamData)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void OnOpen()
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void OnReconnected()
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void OnReconnecting()
-        {
-            throw new NotImplementedException();
-        }
+       
     }
 }

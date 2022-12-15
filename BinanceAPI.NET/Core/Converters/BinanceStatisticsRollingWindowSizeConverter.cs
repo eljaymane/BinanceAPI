@@ -25,7 +25,7 @@ namespace BinanceAPI.NET.Core.Converters
             {
                 var kline = Enum.Parse<BinanceStatisticsRollingWindowSize>(param);
                 var str = kline.GetStringValue();
-                if (str == reader.Value.ToString()) return Enum.Parse<BinanceStatisticsRollingWindowSize>(param);
+                if (str == reader?.Value!.ToString()) return Enum.Parse<BinanceStatisticsRollingWindowSize>(param);
             }
             return BinanceStatisticsRollingWindowSize.OneDay;
         }

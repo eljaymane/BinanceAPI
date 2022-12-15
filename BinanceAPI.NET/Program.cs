@@ -59,25 +59,26 @@ var host = builder.Build();
 
 var configuration = new SocketConfiguration(new Uri("wss://stream.binance.com/ws"), true);
 BinanceMarketDataService client = new(loggerFactory,configuration,new CancellationTokenSource());
-var t1 = new Thread(() => { client.KlineStream?.SubscribeAsync(KlineInterval.FifteenMinutes, "BTCBUSD"); });
-var t2 = new Thread(() => { client.RollingWindowStatsStream.SubscribeAsync("BTCBUSD"); });
+client.KlineCandlestickStream.Subscribe(KlineInterval.ThreeMinutes, "BTCBUSD");
+//var t1 = new Thread(() => { client.KlineStream?.SubscribeAsync(KlineInterval.FifteenMinutes, "BTCBUSD"); });
+//var t2 = new Thread(() => { client.RollingWindowStatsStream.SubscribeAsync("BTCBUSD"); });
 //t1.Start();
-t2.Start();
+//t2.Start();
 var threadData = new Thread(async () =>
 {
-    while (true) 
+    while (true)
     {
         try
         {
-            BinanceRollingWindowStatsData data = (BinanceRollingWindowStatsData)client.RollingWindowStatsStream?.GetStreamData();
-            if(data != null) Console.WriteLine(data.LowPrice);
+            BinanceKlineCandlestickData data = (BinanceKlineCandlestickData)client.GetStreamData(BinanceStreamType.KlineCandlestick,"BTCBUSD");
+            if (data != null) Console.WriteLine(data.Data.ClosePrice);
         }
         catch (Exception) { }
-        finally { Thread.Sleep(4000);  }
-        
+        finally { Thread.Sleep(4000); }
+
     }
 
-    
+
 });
 
 threadData.Start();

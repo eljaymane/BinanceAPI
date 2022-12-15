@@ -214,7 +214,7 @@ namespace BinanceAPI.NET.Infrastructure.Connectivity.Socket
         protected void InvokeOnReceive(byte[] data)
         {
             LastActionTime = DateTime.UtcNow;
-            OnMessage.Invoke(data);
+            OnMessage?.Invoke(data);
         }
 
         protected void InvokeOnError(Exception e) => OnError?.Invoke(e);

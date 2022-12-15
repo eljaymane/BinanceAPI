@@ -12,9 +12,8 @@ namespace BinanceAPI.NET.Core.Models.Streams
 {
     public class BinanceAllMarketRollingWindowStatsStream : AbstractBinanceStream<BinanceRollingWindowStatsData>
     {
-        public BinanceAllMarketRollingWindowStatsStream(SocketConfiguration configuration, ILoggerFactory loggerFactory, CancellationTokenSource ctSource) : base(BinanceStreamType.AllMarketRollingWindowStats, configuration, loggerFactory, ctSource)
+        public BinanceAllMarketRollingWindowStatsStream(ref BinanceMarketDataService client) : base(ref client, BinanceStreamType.AllMarketRollingWindowStats)
         {
-            Initialize();
         }
 
         public void SubscribeAsync(BinanceStatisticsRollingWindowSize windowSize)
@@ -22,47 +21,8 @@ namespace BinanceAPI.NET.Core.Models.Streams
             var request = new BinanceWebSocketRequestMessage(0,
               BinanceRequestMessageType.Subscribe, new string[] { StreamType.GetStringValue()!.Replace("<param>", windowSize.GetStringValue()) }) ;
            
-            Client.SendRequestAsync(request);
+            //Client.SendRequestAsync(request);
         }
-        public override void Initialize()
-        {
-            Client.OnError += OnError;
-            Client.OnClose += OnClose;
-            Client.OnReconnected += OnReconnected;
-            Client.OnReconnecting += OnReconnecting;
-            Client.OnMessage += OnMessage;
-            Client.OnOpen += OnOpen;
-            Client.Start();
-        }
-
-        public override void OnClose()
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void OnError(Exception exception)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void OnMessage(byte[] streamData)
-        {
-            base.OnMessage(streamData);
-        }
-
-        public override void OnOpen()
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void OnReconnected()
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void OnReconnecting()
-        {
-            throw new NotImplementedException();
-        }
+       
     }
 }

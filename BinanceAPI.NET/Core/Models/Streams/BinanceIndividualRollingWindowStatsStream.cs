@@ -12,51 +12,16 @@ namespace BinanceAPI.NET.Core.Models.Streams
 {
     public class BinanceIndividualRollingWindowStatsStream : AbstractBinanceStream<BinanceRollingWindowStatsData>
     {
-        public BinanceIndividualRollingWindowStatsStream(SocketConfiguration configuration, ILoggerFactory loggerFactory, CancellationTokenSource ctSource) : base(BinanceStreamType.IndividualRollingWindowStats, configuration, loggerFactory, ctSource)
+        public BinanceIndividualRollingWindowStatsStream(ref BinanceMarketDataService client) : base(ref client, BinanceStreamType.IndividualRollingWindowStats)
         {
-            Initialize();
         }
 
         public void SubscribeAsync(string symbol, BinanceStatisticsRollingWindowSize? windowSize = BinanceStatisticsRollingWindowSize.OneHour)
         {
             var request = new BinanceWebSocketRequestMessage(0,
                BinanceRequestMessageType.Subscribe, new string[] { symbol.ToLower() +  StreamType.GetStringValue()! + windowSize!.GetStringValue() });
-            Client.SendRequestAsync(request);
+            //Client.SendRequestAsync(request);
         }
-        public override void Initialize()
-        {
-            Client.OnError += OnError;
-            Client.OnClose += OnClose;
-            Client.OnReconnected += OnReconnected;
-            Client.OnReconnecting += OnReconnecting;
-            Client.OnMessage += OnMessage;
-            Client.OnOpen += OnOpen;
-            Client.Start();
-        }
-
-        public override void OnClose()
-        {
-        }
-
-        public override void OnError(Exception exception)
-        {
-        }
-
-        public override void OnMessage(byte[] streamData)
-        {
-            base.OnMessage(streamData);
-        }
-
-        public override void OnOpen()
-        {
-        }
-
-        public override void OnReconnected()
-        {
-        }
-
-        public override void OnReconnecting()
-        {
-        }
+       
     }
 }
