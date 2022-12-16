@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace BinanceAPI.NET.Infrastructure.Attributes
 {
+    /// <summary>
+    /// This attribute makes it possible to have a string value attached to an enum by using [StringValue("")]
+    /// </summary>
     [AttributeUsage(AttributeTargets.Field)]
     public class StringValueAttribute : Attribute
     {

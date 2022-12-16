@@ -7,8 +7,7 @@ using System.Collections.Concurrent;
 using System.Net.WebSockets;
 
 namespace BinanceAPI.NET.Infrastructure.Connectivity.Socket
-{
-ary>
+{   ///<summary>
     /// This is an implementation of an asynchronous socket client that can connect to a remote host, receive and send data. All the behavioral response to messages is triggered using the delegates OnMessage, OnError...
     /// </summary>
     public class WebSocketClient : IWebSocket
@@ -48,8 +47,6 @@ ary>
             _logger = logger;
             Configuration = configuration;
             _ctsSource = ctsSource == null ? new CancellationTokenSource() : ctsSource;
-            _sentPackets = new();
-            _receivedPackets = new();
             _sendEvent = new();
             _sendBuffer = new();
             _socket = CreateSocket();

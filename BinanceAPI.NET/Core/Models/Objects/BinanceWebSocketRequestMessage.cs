@@ -1,4 +1,5 @@
 ﻿using BinanceAPI.NET.Core.Converters;
+using BinanceAPI.NET.Core.Interfaces;
 using BinanceAPI.NET.Core.Models.Enums;
 using BinanceAPI.NET.Core.Models.Socket.Clients;
 using BinanceAPI.NET.Infrastructure.Interfaces;

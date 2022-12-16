@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <Folder Include="Core\Abstractions\" />
+    <Folder Include="Infrastructure\Connectivity\Socket\Objects\" />
   </ItemGroup>
 
   <ItemGroup>
