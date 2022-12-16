@@ -2,6 +2,9 @@
 
 namespace BinanceAPI.NET.Infrastructure.Interfaces
 {
+    /// <summary>
+    /// The configuration contract that should be implemented to use the WebSocketService
+    /// </summary>
     public interface ISocketConfiguration
     {
         public int SOCKET_BUFFER_SIZE { get; }

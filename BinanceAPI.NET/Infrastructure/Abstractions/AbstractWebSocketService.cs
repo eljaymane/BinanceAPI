@@ -5,6 +5,10 @@ using BinanceAPI.NET.Infrastructure.Interfaces;
 
 namespace BinanceAPI.NET.Infrastructure.Abstractions
 {
+    /// <summary>
+    /// Base class for the WebSocketService.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public abstract class AbstractWebSocketService<T> : IWebSocketService<T> where T : IRequestDataType
     {
         internal IWebSocket Client;
@@ -25,7 +29,6 @@ namespace BinanceAPI.NET.Infrastructure.Abstractions
 
         public abstract void Start();
         public abstract void SendRequestAsync(T request);
-        public abstract Task<IBinanceResponse<IBinanceStreamData>?> Deserialize(byte[] message);
         public abstract Task<byte[]> Serialize(T obj);
 
     }

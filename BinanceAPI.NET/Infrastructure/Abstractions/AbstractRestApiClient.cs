@@ -13,13 +13,16 @@ using System.Threading.Tasks;
 
 namespace BinanceAPI.NET.Infrastructure.Abstractions
 {
+    /// <summary>
+    /// Base class for the HTTP rest client.
+    /// </summary>
     public abstract class AbstractRestApiClient : IRestClient
     {
         public ILogger Logger;
         private AuthenticationProvider authenticationProvider;
         public IRequestFactory RequestFactory { get; set; }
 
-        public abstract TimeSyncInfo GetTimeSyncInfo();
+        //public abstract TimeSyncInfo GetTimeSyncInfo();
         public abstract TimeSpan GetTimeOffset();
         public int TotalRequestsMade { get; set; } = 0;
         private HttpConfiguration Configuration { get; set; }

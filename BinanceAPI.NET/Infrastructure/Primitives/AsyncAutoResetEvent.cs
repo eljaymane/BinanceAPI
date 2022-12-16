@@ -6,6 +6,10 @@ using System.Threading.Tasks;
 
 namespace BinanceAPI.NET.Infrastructure.Primitives
 {
+    /// <summary>
+    /// This is an implementation of an asynchronous AutoResetEvent based on work of Stephen Toub published in Microsoft's DevBlog : https://devblogs.microsoft.com/pfxteam/building-async-coordination-primitives-part-2-asyncautoresetevent/
+    /// It is used to asynchronously wait for sending task to finish before writing to the "_sendBuffer" and vice versa (Used in WebSocketClient).
+    /// </summary>
     public class AsyncAutoResetEvent
     {
         private readonly static Task s_completed = Task.FromResult(true);

@@ -6,6 +6,9 @@ using BinanceAPI.NET.Infrastructure.Enums;
 
 namespace BinanceAPI.NET.Infrastructure.Interfaces
 {
+    /// <summary>
+    /// Request factory for HTTP requests.
+    /// </summary>
     public interface IRequestFactory
     {
         IRequestFactory Configure(TimeSpan timeout, HttpConfiguration configuration, HttpClient? httpClient = null);

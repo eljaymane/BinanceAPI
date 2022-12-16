@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace BinanceAPI.NET.Infrastructure.Interfaces
 {
+    /// <summary>
+    /// Data contract for requests being sent by the WebSocketClient.
+    /// </summary>
     public interface IRequestDataType
     {
         public static JsonSerializerSettings GetSerialiazationSettings()

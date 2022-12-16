@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace BinanceAPI.NET.Infrastructure.Extensions
 {
+    /// <summary>
+    /// This extension makes it possible to retrieve value of StringValue attribute [StringValue(<value>)] using GetStringValue().
+    /// </summary>
     public static class StringValueExtension
     {
         public static string? GetStringValue(this Enum value)

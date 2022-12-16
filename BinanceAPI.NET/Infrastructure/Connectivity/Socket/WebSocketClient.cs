@@ -8,17 +8,9 @@ using System.Net.WebSockets;
 
 namespace BinanceAPI.NET.Infrastructure.Connectivity.Socket
 {
-    public struct ReceivedPacket
-    {
-        internal DateTime ReceivedAt;
-        internal int Bytes { get; set; }
-
-        public ReceivedPacket(DateTime receivedAt, int bytes)
-        {
-            ReceivedAt = receivedAt;
-            Bytes = bytes;
-        }
-    }
+ary>
+    /// This is an implementation of an asynchronous socket client that can connect to a remote host, receive and send data. All the behavioral response to messages is triggered using the delegates OnMessage, OnError...
+    /// </summary>
     public class WebSocketClient : IWebSocket
     {
         private ILogger _logger;
@@ -27,25 +19,22 @@ namespace BinanceAPI.NET.Infrastructure.Connectivity.Socket
 
         private readonly AsyncAutoResetEvent _sendEvent;
         private readonly ConcurrentQueue<byte[]> _sendBuffer;
-        public  List<ReceivedPacket> _receivedPackets;
-        private readonly List<DateTime> _sentPackets;
         private CancellationTokenSource _ctsSource = new CancellationTokenSource();
 
         private ClientWebSocket _socket;
         
         private WebSocketProcessState _processState;
-        private Task? _closeTask;
         private bool disposed;
-        private DateTime lastReconnectTime;
         private DateTime lastReceivedPacketsUpdate;
 
         public int Id { get; }
         public SocketConfiguration Configuration { get; }
-        public DateTime LastActionTime { get; private set; }
         public Uri BaseUri => Configuration.BaseUri;
         public bool IsOpen => _socket.State == WebSocketState.Open && !_ctsSource.IsCancellationRequested;
         public bool IsClosed => _socket.State == WebSocketState.Closed;
-
+        /// <summary>
+        /// These events are used to trigger behaviors according to the client events.
+        /// </summary>
         public event Action<Exception>? OnError;
         public event Action<byte[]>? OnMessage;
         public event Action? OnClose;
@@ -65,7 +54,10 @@ namespace BinanceAPI.NET.Infrastructure.Connectivity.Socket
             _sendBuffer = new();
             _socket = CreateSocket();
         }
-
+        /// <summary>
+        /// The function that generates the websocket object that is used by this client.
+        /// </summary>
+        /// <returns></returns>
         private ClientWebSocket CreateSocket()
         {
             var socket = new ClientWebSocket();
@@ -81,7 +73,10 @@ namespace BinanceAPI.NET.Infrastructure.Connectivity.Socket
             }catch(PlatformNotSupportedException) { }
             return socket;
         }
-
+        /// <summary>
+        /// The function that connects to a remote host , starts the send and receive loop then calls OnOpen delegate which is implemented elsewhere.
+        /// </summary>
+        /// <returns></returns>
         public virtual async Task ConnectAsync()
         {
             CancellationTokenSource cts = new(TimeSpan.FromSeconds(5));
@@ -96,7 +91,10 @@ namespace BinanceAPI.NET.Infrastructure.Connectivity.Socket
 
             OnOpen?.Invoke();  
         }
-
+        /// <summary>
+        /// The send loop : Keeps sending anything queued to _sendBuffer.
+        /// </summary>
+        /// <returns></returns>
         private async Task StartSendingAsync()
         {
            
@@ -110,7 +108,10 @@ namespace BinanceAPI.NET.Infrastructure.Connectivity.Socket
                 }
             }
         }
-
+        /// <summary>
+        /// The receive loop : Keeps receiving and calling HandleMessage to take care of the received data.
+        /// </summary>
+        /// <returns></returns>
         private async Task StartReceivingAsync()
         {
             var buffer= new ArraySegment<byte>(new byte[Configuration.SOCKET_BUFFER_SIZE]);
@@ -127,22 +128,24 @@ namespace BinanceAPI.NET.Infrastructure.Connectivity.Socket
                 finally
                 {
                     buffer = new(new byte[Configuration.SOCKET_BUFFER_SIZE]);
-                    Thread.Sleep(1000);
                 }
-                
-                
-               
-                //string json = Configuration.Encoding.GetString(buffer).Replace("\0","");
-                //dynamic d = JsonSerializer.Deserialize(json,typeof(object));
             }
         }
-
+        /// <summary>
+        /// Removing trailing 0's from received messages.
+        /// </summary>
+        /// <param name="data">Received bytes</param>
+        /// <returns></returns>
         private Task<byte[]> removeZeros(byte[] data)
         {
             var stringData = Configuration.Encoding.GetString(data).Replace("\0","");
             return Task.FromResult(Configuration.Encoding.GetBytes(stringData));
         }
-
+        /// <summary>
+        /// Handles every received message, by either closing if it's a close message or calling OnMessage which is implemented elsewhere.
+        /// </summary>
+        /// <param name="message">The received message</param>
+        /// <param name="buffer">The received bytes</param>
         private void HandleMessage(WebSocketReceiveResult message, byte[] buffer)
         {
             if (message.MessageType == WebSocketMessageType.Close)
@@ -155,7 +158,11 @@ namespace BinanceAPI.NET.Infrastructure.Connectivity.Socket
                 OnMessage?.Invoke(buffer);
             }
         }
-
+        /// <summary>
+        /// The method used to enqueue messages to be sent on the _sendBuffer.
+        /// </summary>
+        /// <param name="data">Bytes to be sent</param>
+        /// <returns></returns>
         public virtual Task SendAsync(ArraySegment<byte> data)
         {
             if (_ctsSource.IsCancellationRequested) return Task.FromCanceled(_ctsSource.Token);
@@ -166,6 +173,10 @@ namespace BinanceAPI.NET.Infrastructure.Connectivity.Socket
             }
             return Task.CompletedTask;
         }
+        /// <summary>
+        /// Closes the already connected socket object
+        /// </summary>
+        /// <returns></returns>
         private async Task CloseInternalAsync()
         {
             if(disposed) return;
@@ -187,14 +198,6 @@ namespace BinanceAPI.NET.Infrastructure.Connectivity.Socket
             }
         }
 
-        public virtual async Task ReconnectAsync()
-        {
-            if (_processState != WebSocketProcessState.Processing && IsOpen)
-                return;
-            _closeTask = CloseInternalAsync();
-            await _closeTask.ConfigureAwait(false);
-        }
-
         private static int NextStreamId()
         {
             lock(streamIdLock)
@@ -204,63 +207,5 @@ namespace BinanceAPI.NET.Infrastructure.Connectivity.Socket
             }
         }
 
-        private int MessagesSentLastSecond()
-        {
-            var time = DateTime.UtcNow;
-            _sentPackets.RemoveAll(e => time - e > TimeSpan.FromSeconds(1));
-            return _sentPackets.Count;
-        }
-
-        protected void InvokeOnReceive(byte[] data)
-        {
-            LastActionTime = DateTime.UtcNow;
-            OnMessage?.Invoke(data);
-        }
-
-        protected void InvokeOnError(Exception e) => OnError?.Invoke(e);
-
-        protected void InvokeOnClose() => OnClose?.Invoke();
-        protected void InvokeOnReconnecting() => OnReconnecting?.Invoke();
-        protected void InvokeOnReconnected() => OnReconnected?.Invoke();
-        protected async Task CheckTimeoutAsync()
-        {
-            try
-            {
-                while(!_ctsSource.IsCancellationRequested) 
-                {
-                    if(DateTime.UtcNow - LastActionTime > Configuration.Timeout)
-                    {
-                        _logger.LogInformation($"Socket {Id} : Didn't receive data for {Configuration.Timeout}. Reconnecting...");
-                        _ = ReconnectAsync().ConfigureAwait(false);
-                        return;
-                    }
-                    try
-                    {
-                        await Task.Delay(500,_ctsSource.Token).ConfigureAwait(false);
-                    } catch(OperationCanceledException) { break; }
-                }
-            }catch(Exception e)
-            {
-                InvokeOnError(e);
-                throw;
-            }
-        }
-
-        protected void UpdateReceivedPackets()
-        {
-            var checkTime = DateTime.UtcNow;
-        if (checkTime - lastReceivedPacketsUpdate > TimeSpan.FromSeconds(1))
-            {
-                foreach (var packet in _receivedPackets)
-                {
-                    if (checkTime - packet.ReceivedAt > TimeSpan.FromSeconds(3))
-                        _receivedPackets.Remove(packet);
-
-                    lastReceivedPacketsUpdate= checkTime;
-                }
-            }
-                
-                    
-        }
     }
 }

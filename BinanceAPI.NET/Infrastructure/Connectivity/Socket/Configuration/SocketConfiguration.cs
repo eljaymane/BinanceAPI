@@ -7,6 +7,9 @@ using BinanceAPI.NET.Infrastructure.Interfaces;
 
 namespace BinanceAPI.NET.Infrastructure.Connectivity.Socket.Configuration
 {
+    /// <summary>
+    /// The configuration object used by the socket client.
+    /// </summary>
     public class SocketConfiguration : ISocketConfiguration
     {
         public int SOCKET_BUFFER_SIZE { get { return 65536; } }
