@@ -13,7 +13,7 @@ namespace BinanceAPI.NET.Infrastructure.Connectivity.Socket
     public class WebSocketClient : IWebSocket
     {
         private ILogger _logger;
-        internal static int lastStreamId;
+        internal static int lastStreamId =0;
         private static readonly object streamIdLock = new();
 
         private readonly AsyncAutoResetEvent _sendEvent;

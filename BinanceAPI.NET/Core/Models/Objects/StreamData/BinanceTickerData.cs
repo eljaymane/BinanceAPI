@@ -1,4 +1,5 @@
-﻿using BinanceAPI.NET.Core.Interfaces;
+﻿using BinanceAPI.NET.Core.Converters;
+using BinanceAPI.NET.Core.Interfaces;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
@@ -37,9 +38,9 @@ namespace BinanceAPI.NET.Core.Models.Objects.StreamData
         public decimal TotalTradedBaseAsset { get; set; }
         [JsonProperty("q")]
         public decimal TotalTradedQuoteAsset { get; set; }
-        [JsonProperty("O"), JsonConverter((typeof(UnixDateTimeConverter)))]
+        [JsonProperty("O"), JsonConverter((typeof(UnixTimestampDateConverter)))]
         public DateTime OpenTime { get; set; }
-        [JsonProperty("C"), JsonConverter((typeof(UnixDateTimeConverter)))]
+        [JsonProperty("C"), JsonConverter((typeof(UnixTimestampDateConverter)))]
         public DateTime CloseTime { get; set; }
         [JsonProperty("F")]
         public long FirstTradeId { get; set; }

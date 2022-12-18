@@ -12,6 +12,8 @@ namespace BinanceAPI.NET.Core.Models.Enums
         Kline,
         [StringValue("24hrMiniTicker")]
         TwentyFourHoursMiniTicker,
+        [StringValue("24hrTicker")]
+        TwentyFourHourTicker,
         [StringValue("1hTicker")]
         OneHourTicker
     }

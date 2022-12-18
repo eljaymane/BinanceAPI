@@ -7,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using System.Reflection.Metadata.Ecma335;
 
 static void ConfigureServices(IServiceCollection services)
 {
@@ -57,10 +58,11 @@ var builder = CreateHostBuilder(args).ConfigureServices((_, services) => service
 var host = builder.Build();
 
 
-var configuration = new SocketConfiguration(new Uri("wss://stream.binance.com/ws"), true);
+var configuration = new SocketConfiguration(new Uri("wss://stream.binance.com/stream"), true);
 BinanceMarketDataService client = new(loggerFactory,configuration,new CancellationTokenSource());
 client.KlineCandlestickStream.Subscribe(KlineInterval.ThreeMinutes, "BTCBUSD");
-client.RollingWindowStatsStream.SubscribeAsync("BTCBUSD");
+int i = 0;
+client.TickerStream.SubscribeAsync("BTCBUSD");
 var threadData = new Thread(async () =>
 {
     while (true)
@@ -68,12 +70,13 @@ var threadData = new Thread(async () =>
         try
         {
             BinanceKlineCandlestickData data = (BinanceKlineCandlestickData)client.GetStreamData(BinanceStreamType.KlineCandlestick,"BTCBUSD");
-            BinanceRollingWindowStatsData dat = (BinanceRollingWindowStatsData)client.GetStreamData(BinanceStreamType.IndividualRollingWindowStats, "BTCBUSD");
+            BinanceTickerData dat = (BinanceTickerData)client.GetStreamData(BinanceStreamType.IndividualSymbolTicker, "BTCBUSD");
             if (data != null) Console.WriteLine(data.Data.ClosePrice);
-            if (dat != null) Console.WriteLine(dat.OpenPrice);
+            if (dat != null) Console.WriteLine(dat.BestAskPrice);
+            if (i == 4) client.UnsubscribeAll();
         }
         catch (Exception) { }
-        finally { Thread.Sleep(4000); }
+        finally { Thread.Sleep(4000); i++; }
 
     }
 
