@@ -14,7 +14,11 @@ namespace BinanceAPI.NET.Core.Models.Enums
         TwentyFourHoursMiniTicker,
         [StringValue("24hrTicker")]
         TwentyFourHourTicker,
+        [StringValue("4hTicker")]
+        FourHoursRollingWindow,
         [StringValue("1hTicker")]
-        OneHourTicker
+        OneHourRollingWindow,
+        [StringValue("1dTicker")]
+        OneDayRollingWindow
     }
 }

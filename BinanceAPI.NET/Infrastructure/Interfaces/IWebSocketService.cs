@@ -3,6 +3,10 @@ using BinanceAPI.NET.Core.Interfaces;
 
 namespace BinanceAPI.NET.Infrastructure.Interfaces
 {
+    /// <summary>
+    /// WebSocketService contract of a websocket client capable of sending a request T and acting based on the events described in the contract.
+    /// </summary>
+    /// <typeparam name="T">Contract of the request data type to be sent.</typeparam>
     public interface IWebSocketService<T> where T : IRequestDataType
     {
         void Start();

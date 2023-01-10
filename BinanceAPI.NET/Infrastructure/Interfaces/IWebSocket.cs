@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace BinanceAPI.NET.Infrastructure.Interfaces
 {
+    /// <summary>
+    /// Contract of the raw web socket that sends and receives raw bytes. It also acts based on the events described in the contract.
+    /// </summary>
     public interface IWebSocket
     {
         public event Action<Exception>? OnError { add => OnError += value;  remove => OnError -= value; }

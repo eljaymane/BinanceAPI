@@ -19,7 +19,7 @@ namespace BinanceAPI.NET.Core.Models.Streams
         {
         }
 
-        public Task Subscribe(KlineInterval interval, string symbol)
+        public Task SubscribeAsync(KlineInterval interval, string symbol)
         {
             Client.SubscribeAsync(symbol.ToLower() + StreamType.GetStringValue() + interval.GetStringValue());
             return Task.CompletedTask;

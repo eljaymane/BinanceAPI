@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace BinanceAPI.NET.Infrastructure.Enums
 {
+    /// <summary>
+    /// The different states the WebSocket client can have.
+    /// </summary>
     internal enum WebSocketProcessState
     {
         Idle,

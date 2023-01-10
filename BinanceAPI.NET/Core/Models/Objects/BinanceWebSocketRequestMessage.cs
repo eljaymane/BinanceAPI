@@ -1,12 +1,14 @@
 ﻿using BinanceAPI.NET.Core.Converters;
 using BinanceAPI.NET.Core.Interfaces;
 using BinanceAPI.NET.Core.Models.Enums;
-using BinanceAPI.NET.Core.Models.Socket.Clients;
 using BinanceAPI.NET.Infrastructure.Interfaces;
 using Newtonsoft.Json;
 
 namespace BinanceAPI.NET.Core.Models.Objects
 {
+    /// <summary>
+    /// The standard response from a Binance Websocket Stream. Refer to the Binance documentation for more.
+    /// </summary>
     [Serializable]
     public class BinanceWebSocketRequestMessage : IBinanceRequest, IRequestDataType
     {

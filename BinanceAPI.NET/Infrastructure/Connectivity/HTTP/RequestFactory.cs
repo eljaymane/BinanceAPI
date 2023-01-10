@@ -12,6 +12,9 @@ using System.Threading.Tasks;
 
 namespace BinanceAPI.NET.Infrastructure.Connectivity.HTTP
 {
+    /// <summary>
+    /// A factory that can correctly generate an IRequest, add a content, header to it. If provided, an AuthenticationProvider is used to authenticate the request.
+    /// </summary>
     public class RequestFactory : IRequestFactory
     {
         private HttpClient? _httpClient;

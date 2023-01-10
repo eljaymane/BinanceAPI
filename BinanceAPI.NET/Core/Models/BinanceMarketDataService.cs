@@ -20,11 +20,22 @@ using BinanceAPI.NET.Core.Models.Objects.Entities;
 
 namespace BinanceAPI.NET.Core.Models
 {
+    /// <summary>
+    /// The service that provides access to Binance Websocket streams. It does also hold the data coming from any particular stream.
+    /// Data can be accessed from StreamData using the event type and instrument ex : BTCBUSD.
+    /// To subscribe to a stream, the corresponding member should be used, the data in the other hand is accessed in a centralized way.
+    /// </summary>
     public class BinanceMarketDataService
     {
         public ILoggerFactory LoggerFactory { get; set; }
+        /// <summary>
+        /// The configuration used for the websocket connection underneath the service.
+        /// </summary>
         public ISocketConfiguration Configuration { get; set; }
-        public ConcurrentDictionary<BinanceStreamType, Dictionary<string,IBinanceStreamData>> StreamData = new();
+        /// <summary>
+        /// The centralized place where all the upcoming data fall into.
+        /// </summary>
+        public ConcurrentDictionary<BinanceEventType, Dictionary<string,IBinanceStreamData>> StreamData = new();
         public List<string> Subscriptions;
         public BinanceKlineCandlestickStream KlineCandlestickStream { get; set; }
         public BinanceTickerStream TickerStream { get; set; }
@@ -69,7 +80,7 @@ namespace BinanceAPI.NET.Core.Models
             
             var request = new BinanceWebSocketRequestMessage(lastSubscriptionId, BinanceRequestMessageType.Unsubscribe, payload);
             Client.SendRequestAsync(request).Wait();
-            Thread.Sleep(2000); //Little workaround to wait the server to unsubscribe. Will be correctly adressed in a later version.
+            Thread.Sleep(2000); //Little workaround to wait the server to unsubscribe.
             return Task.CompletedTask;
         }
 
@@ -123,6 +134,7 @@ namespace BinanceAPI.NET.Core.Models
         }
         public void Initialize()
         {
+            /// Actions that handle the socket client events.
             Client.OnError += OnError;
             Client.OnClose += OnClose;
             Client.OnReconnected += OnReconnected;
@@ -130,6 +142,8 @@ namespace BinanceAPI.NET.Core.Models
             Client.OnMessage += OnMessage;
             Client.OnOpen += OnOpen;
             
+            ///Creating new instances of the stream object which are more of a request factory that holds a reference to this service
+            /// in a way that all the upcoming data falls into one single place.
             KlineCandlestickStream = new (this);
             TickerStream = new (this);
             MiniTickerStream= new (this);
@@ -139,6 +153,7 @@ namespace BinanceAPI.NET.Core.Models
             TradeStream= new(this);
             AggregateTradeStream= new(this);
 
+            ///Socket thread.
             var socket = new Thread(() => {
                 Client.Start();
             });
@@ -161,28 +176,33 @@ namespace BinanceAPI.NET.Core.Models
 
         public virtual void OnMessage(byte[] streamData)
         {
-            var eventType = Deserialize(streamData, IBinanceStreamData.GetSerializationSettings()).Result.Data?.EventType;
+            var eventType = Deserialize(streamData, IBinanceStreamData.GetSerializationSettings()).Result.Data.EventType;
             DispatchMessage(eventType,streamData);
         }
 
-        private void DispatchMessage(BinanceEventType? type, byte[] streamData)
+        private void DispatchMessage(BinanceEventType type, byte[] streamData)
         {
             
                 switch (type)
                 {
                     case BinanceEventType.Kline:
 
-                        var kline = (BinanceKlineCandlestickData)JsonConvert.DeserializeObject<BinanceStreamResponse<BinanceKlineCandlestickData>>(Configuration.Encoding.GetString(streamData), IBinanceStreamData.GetSerializationSettings()).Data;
-                        GetStreamData(BinanceStreamType.KlineCandlestick).Remove(kline.Symbol);
-                        GetStreamData(BinanceStreamType.KlineCandlestick).Add(kline.Symbol, kline);
+                        var kline = JsonConvert.DeserializeObject<BinanceStreamResponse<BinanceKlineCandlestickData>>(Configuration.Encoding.GetString(streamData), IBinanceStreamData.GetSerializationSettings()).Data;
+                        GetStreamData(type).Remove(kline.Symbol);
+                        GetStreamData(type).Add(kline.Symbol, kline);
                         break;
 
                     case BinanceEventType.TwentyFourHourTicker:
                         var ticker = JsonConvert.DeserializeObject<BinanceStreamResponse<BinanceTickerData>>(Configuration.Encoding.GetString(streamData), IBinanceStreamData.GetSerializationSettings()).Data;
-                        GetStreamData(BinanceStreamType.IndividualSymbolTicker).Remove(ticker.Symbol);
-                        GetStreamData(BinanceStreamType.KlineCandlestick).Add(ticker.Symbol, ticker);
+                        GetStreamData(type).Remove(ticker.Symbol);
+                        GetStreamData(type).Add(ticker.Symbol, ticker);
                         break;
-                default: break;
+                    case BinanceEventType.OneHourRollingWindow or BinanceEventType.FourHoursRollingWindow or BinanceEventType.OneDayRollingWindow:
+                        var rollingWindow = JsonConvert.DeserializeObject<BinanceStreamResponse<BinanceRollingWindowStatsData>>(Configuration.Encoding.GetString(streamData), IBinanceStreamData.GetSerializationSettings()).Data;
+                        GetStreamData(type).Remove(rollingWindow.Symbol);
+                        GetStreamData(type).Add(rollingWindow.Symbol, rollingWindow);
+                        break;
+                    default: break;
                 }
         }
 
@@ -196,21 +216,36 @@ namespace BinanceAPI.NET.Core.Models
         {
 
         }
+        /// <summary>
+        /// The method that returns a dictionary holding streams of different instruments of the same type (stream type)
+        /// </summary>
+        /// <param name="streamType"></param>
+        /// <returns></returns>
 
-        public Dictionary<string,IBinanceStreamData> GetStreamData(BinanceStreamType streamType)
+        public Dictionary<string,IBinanceStreamData> GetStreamData(BinanceEventType streamType)
 
         {
             Dictionary<string, IBinanceStreamData> result;
             StreamData.TryGetValue(streamType, out result);
             return result;
         }
-
-        public IBinanceStreamData GetStreamData(BinanceStreamType streamType, string symbol)
+        /// <summary>
+        /// The method that returns the desired stream data
+        /// </summary>
+        /// <param name="streamType">Refer to BinanceEventType</param>
+        /// <param name="symbol">Desired symbol ex : BTCBUSD</param>
+        /// <returns></returns>
+        public IBinanceStreamData GetStreamData(BinanceEventType streamType, string symbol)
         {
             GetStreamData(streamType).TryGetValue(symbol, out IBinanceStreamData result);
             return result;
         }
-
+        /// <summary>
+        /// The message that turns bytes into a BinanceStreamResponse object.
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="Options"></param>
+        /// <returns></returns>
         private Task<BinanceStreamResponse<BinanceStreamData>> Deserialize(byte[] message, JsonSerializerSettings Options)
         {
             var json = Configuration.Encoding.GetString(message);

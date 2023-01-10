@@ -1,5 +1,8 @@
 ﻿namespace BinanceAPI.NET.Infrastructure.Interfaces
 {
+    /// <summary>
+    /// Contract of the request to be sent using the websocket client.
+    /// </summary>
     public interface IRequest : IDisposable
     {
         IRequest AddHeader(KeyValuePair<string, string> header);
