@@ -1,5 +1,5 @@
 # Binance Websocket API
-This project is an incomplete implementation of binance websocket streams. It's purpose is fully educational.
+This project is a simple implementation of binance websocket streams. It's purpose is fully educational.
 It's based on a simple asynchronous websocket client and can handle subscription to multiple streams.
 It does also provide a centralized access to the data resulting from subscriptions.
 
