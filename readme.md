@@ -4,9 +4,9 @@ It's based on a simple asynchronous websocket client and can handle subscription
 It does also provide a centralized access to the data resulting from subscriptions.
 
 ## Core
-This represents the binance implementation of the WebSocket communication. Anything related to binance is found there.
+This part represents the binance implementation of the WebSocket communication. Anything related to binance is found there.
 ## Infrastructure
-This represents the technical part of the implementation. This holds a simple asynchronous client, heavily commented to make it easier to understand. The same infrastructure could be used for any other asynchronous WebSocket implementation.
+This part represents the technical part of the implementation. It holds a simple asynchronous client, heavily commented to make it easier to understand. The same infrastructure could be used for any other asynchronous WebSocket implementation.
 ## Usage 
 ```C#
 var configuration = new SocketConfiguration(new Uri("wss://stream.binance.com/stream"), true);
