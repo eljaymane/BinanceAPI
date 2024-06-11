@@ -57,24 +57,21 @@ var builder = CreateHostBuilder(args).ConfigureServices((_, services) => service
 
 var host = builder.Build();
 
-
-var configuration = new SocketConfiguration(new Uri("wss://stream.binance.com/stream"), true);
+var uri = new Uri("wss://stream.binance.com:9443/ws");
+var configuration = new SocketConfiguration(uri, true);
 BinanceMarketDataService client = new(loggerFactory,configuration,new CancellationTokenSource());
-client.KlineCandlestickStream.SubscribeAsync(KlineInterval.ThreeMinutes, "BTCBUSD");
-client.TickerStream.SubscribeAsync("BTCBUSD");
+client.KlineCandlestickStream.SubscribeAsync(KlineInterval.OneSecond, "BTCUSDT");
 var threadData = new Thread(() =>
 {
     while (true)
     {
         try
         {
-            BinanceKlineCandlestickData data = (BinanceKlineCandlestickData)client.GetStreamData(BinanceEventType.Kline,"BTCBUSD");
-            BinanceTickerData dat = (BinanceTickerData)client.GetStreamData(BinanceEventType.TwentyFourHourTicker, "BTCBUSD");
+            BinanceKlineCandlestickData data = (BinanceKlineCandlestickData)client.GetStreamData(BinanceStreamType.KlineCandlestick,"BTCUSDT");
             if (data != null) Console.WriteLine(data.Data.ClosePrice);
-            if (dat != null) Console.WriteLine(dat.BestAskPrice);
         }
         catch (Exception) { }
-        finally { Thread.Sleep(4000); }
+        finally { Thread.Sleep(2000); }
 
     }
 

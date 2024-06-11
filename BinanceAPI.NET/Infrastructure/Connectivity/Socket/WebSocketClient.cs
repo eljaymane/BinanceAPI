@@ -13,7 +13,7 @@ namespace BinanceAPI.NET.Infrastructure.Connectivity.Socket
     public class WebSocketClient : IWebSocket
     {
         private ILogger _logger;
-        internal static int lastStreamId =0;
+        internal static int lastStreamId =1;
         private static readonly object streamIdLock = new();
 
         private readonly AsyncAutoResetEvent _sendEvent;
@@ -80,11 +80,11 @@ namespace BinanceAPI.NET.Infrastructure.Connectivity.Socket
             _socket.ConnectAsync(BaseUri, _ctsSource.Token).Wait(_ctsSource.Token);
             if(_socket.State!= WebSocketState.Open) { _ctsSource.Cancel(); return; }
             
-            var t2 = new Thread( async () => { await StartReceivingAsync(); });
-            var t1 = new Thread(async () => { await StartSendingAsync(); });
+            var t2 = new Thread( () => { StartReceivingAsync(); });
+            var t1 = new Thread( () => { StartSendingAsync(); });
             t1.Start();
             t2.Start();
-       
+
 
             OnOpen?.Invoke();  
         }
@@ -101,7 +101,7 @@ namespace BinanceAPI.NET.Infrastructure.Connectivity.Socket
                 if(_sendBuffer.TryDequeue(out var data))
                 {
                 _logger.LogInformation("Sending");
-                await _socket.SendAsync(data, WebSocketMessageType.Text, true, _ctsSource.Token);
+                await _socket.SendAsync(data, WebSocketMessageType.Text, true, _ctsSource.Token).ConfigureAwait(false);
                 }
             }
         }

@@ -13,7 +13,6 @@ using System.Text;
 using System.Collections.Concurrent;
 using BinanceAPI.NET.Infrastructure.Connectivity.Socket;
 using BinanceAPI.NET.Core.Interfaces;
-using BinanceAPI.NET.Core.Models.Socket.Clients;
 using BinanceAPI.NET.Core.Models.Objects.StreamData;
 using System.IO;
 using BinanceAPI.NET.Core.Models.Objects.Entities;
@@ -35,7 +34,7 @@ namespace BinanceAPI.NET.Core.Models
         /// <summary>
         /// The centralized place where all the upcoming data fall into.
         /// </summary>
-        public ConcurrentDictionary<BinanceEventType, Dictionary<string,IBinanceStreamData>> StreamData = new();
+        public ConcurrentDictionary<BinanceStreamType, Dictionary<string,IBinanceStreamData>> StreamData = new();
         public List<string> Subscriptions;
         public BinanceKlineCandlestickStream KlineCandlestickStream { get; set; }
         public BinanceTickerStream TickerStream { get; set; }
@@ -174,10 +173,13 @@ namespace BinanceAPI.NET.Core.Models
 
         }
 
-        public virtual void OnMessage(byte[] streamData)
+        public virtual async void OnMessage(byte[] streamData)
         {
-            var eventType = Deserialize(streamData, IBinanceStreamData.GetSerializationSettings()).Result.Data.EventType;
-            DispatchMessage(eventType,streamData);
+            var eventType = await Deserialize(streamData, IBinanceStreamData.GetSerializationSettings());
+            if(eventType.Data != null){
+                DispatchMessage(eventType.Data.EventType, streamData);
+            }
+            
         }
 
         private void DispatchMessage(BinanceEventType type, byte[] streamData)
@@ -186,21 +188,10 @@ namespace BinanceAPI.NET.Core.Models
                 switch (type)
                 {
                     case BinanceEventType.Kline:
-
-                        var kline = JsonConvert.DeserializeObject<BinanceStreamResponse<BinanceKlineCandlestickData>>(Configuration.Encoding.GetString(streamData), IBinanceStreamData.GetSerializationSettings()).Data;
-                        GetStreamData(type).Remove(kline.Symbol);
-                        GetStreamData(type).Add(kline.Symbol, kline);
-                        break;
-
-                    case BinanceEventType.TwentyFourHourTicker:
-                        var ticker = JsonConvert.DeserializeObject<BinanceStreamResponse<BinanceTickerData>>(Configuration.Encoding.GetString(streamData), IBinanceStreamData.GetSerializationSettings()).Data;
-                        GetStreamData(type).Remove(ticker.Symbol);
-                        GetStreamData(type).Add(ticker.Symbol, ticker);
-                        break;
-                    case BinanceEventType.OneHourRollingWindow or BinanceEventType.FourHoursRollingWindow or BinanceEventType.OneDayRollingWindow:
-                        var rollingWindow = JsonConvert.DeserializeObject<BinanceStreamResponse<BinanceRollingWindowStatsData>>(Configuration.Encoding.GetString(streamData), IBinanceStreamData.GetSerializationSettings()).Data;
-                        GetStreamData(type).Remove(rollingWindow.Symbol);
-                        GetStreamData(type).Add(rollingWindow.Symbol, rollingWindow);
+                        var json = Configuration.Encoding.GetString(streamData);
+                        var kline = JsonConvert.DeserializeObject<BinanceKlineCandlestickData>(json, IBinanceStreamData.GetSerializationSettings());
+                        GetStreamData(BinanceStreamType.KlineCandlestick).Remove(kline.Symbol);
+                        GetStreamData(BinanceStreamType.KlineCandlestick).Add(kline.Symbol, kline);
                         break;
                     default: break;
                 }
@@ -222,7 +213,7 @@ namespace BinanceAPI.NET.Core.Models
         /// <param name="streamType"></param>
         /// <returns></returns>
 
-        public Dictionary<string,IBinanceStreamData> GetStreamData(BinanceEventType streamType)
+        public Dictionary<string,IBinanceStreamData> GetStreamData(BinanceStreamType streamType)
 
         {
             Dictionary<string, IBinanceStreamData> result;
@@ -235,7 +226,7 @@ namespace BinanceAPI.NET.Core.Models
         /// <param name="streamType">Refer to BinanceEventType</param>
         /// <param name="symbol">Desired symbol ex : BTCBUSD</param>
         /// <returns></returns>
-        public IBinanceStreamData GetStreamData(BinanceEventType streamType, string symbol)
+        public IBinanceStreamData GetStreamData(BinanceStreamType streamType, string symbol)
         {
             GetStreamData(streamType).TryGetValue(symbol, out IBinanceStreamData result);
             return result;

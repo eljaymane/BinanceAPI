@@ -8,6 +8,8 @@ namespace BinanceAPI.NET.Core.Models.Enums
     [JsonConverter(typeof(KlineIntervalJsonConverter))]
     public enum KlineInterval
     {
+        [StringValue("1s")]
+        OneSecond,
         [StringValue("1m")]
         OneMinute,
         [StringValue("3m")]
