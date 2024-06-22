@@ -19,6 +19,8 @@ namespace BinanceAPI.NET.Core.Models.Enums
         [StringValue("1hTicker")]
         OneHourRollingWindow,
         [StringValue("1dTicker")]
-        OneDayRollingWindow
+        OneDayRollingWindow,
+        [StringValue("depth")]
+        PartialBookDepth
     }
 }

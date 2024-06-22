@@ -1,16 +1,7 @@
 ﻿using BinanceAPI.NET.Core.Interfaces;
 using BinanceAPI.NET.Core.Models;
 using BinanceAPI.NET.Core.Models.Enums;
-using BinanceAPI.NET.Core.Models.Objects;
-using BinanceAPI.NET.Infrastructure.Connectivity.Socket;
 using BinanceAPI.NET.Infrastructure.Connectivity.Socket.Configuration;
-using BinanceAPI.NET.Infrastructure.Interfaces;
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using System.Collections.Concurrent;
-using System.IO;
-using System.Text;
-using System.Text.Json;
 
 namespace BinanceAPI.NET.Core.Abstractions
 {

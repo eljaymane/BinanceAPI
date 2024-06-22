@@ -16,6 +16,9 @@ using BinanceAPI.NET.Core.Interfaces;
 using BinanceAPI.NET.Core.Models.Objects.StreamData;
 using System.IO;
 using BinanceAPI.NET.Core.Models.Objects.Entities;
+using PEzbus;
+using BinanceAPI.NET.Core.Stats.Historical.Klines.Events;
+using BinanceAPI.NET.Core.Stats.Historical.Klines;
 
 namespace BinanceAPI.NET.Core.Models
 {
@@ -35,7 +38,6 @@ namespace BinanceAPI.NET.Core.Models
         /// The centralized place where all the upcoming data fall into.
         /// </summary>
         public ConcurrentDictionary<BinanceStreamType, Dictionary<string,IBinanceStreamData>> StreamData = new();
-        public List<string> Subscriptions;
         public BinanceKlineCandlestickStream KlineCandlestickStream { get; set; }
         public BinanceTickerStream TickerStream { get; set; }
         public BinanceMiniTickerStream MiniTickerStream { get; set; }
@@ -47,18 +49,21 @@ namespace BinanceAPI.NET.Core.Models
         public CancellationTokenSource TokenSource { get; set; }
         private IWebSocketService<BinanceWebSocketRequestMessage> Client { get; set; }
         private uint lastRequestId = 0;
+        public List<string> Subscriptions;
         private uint lastSubscriptionId;
         private event EventHandler SubscripionsChanged;
+        private readonly IPEzEventBus _eventBus;
 
         
 
-        public BinanceMarketDataService(ILoggerFactory loggerFactory,SocketConfiguration socketConfiguration, CancellationTokenSource tokenSource)
+        public BinanceMarketDataService(ILoggerFactory loggerFactory,SocketConfiguration socketConfiguration, CancellationTokenSource tokenSource, IPEzEventBus eventBus)
         {
             Configuration = socketConfiguration;
             LoggerFactory= loggerFactory;
             Client = new WebSocketService<BinanceWebSocketRequestMessage>(socketConfiguration, loggerFactory, tokenSource);
             TokenSource = tokenSource;
             Subscriptions = new();
+            _eventBus = eventBus;
             Initialize();
         }
 
@@ -176,7 +181,17 @@ namespace BinanceAPI.NET.Core.Models
         public virtual async void OnMessage(byte[] streamData)
         {
             var eventType = await Deserialize(streamData, IBinanceStreamData.GetSerializationSettings());
-            if(eventType.Data != null){
+            if (eventType.lastUpdateId != null)
+            {
+                eventType.EventType = BinanceEventType.PartialBookDepth;
+                DispatchMessage(eventType.EventType, streamData);
+
+            }
+            if(eventType.EventType is BinanceEventType.FourHoursRollingWindow or BinanceEventType.OneHourRollingWindow or BinanceEventType.OneDayRollingWindow)
+            {
+                DispatchMessage(eventType.EventType, streamData);
+            }
+            else if(eventType.Data != null){
                 DispatchMessage(eventType.Data.EventType, streamData);
             }
             
@@ -184,17 +199,27 @@ namespace BinanceAPI.NET.Core.Models
 
         private void DispatchMessage(BinanceEventType type, byte[] streamData)
         {
-            
-                switch (type)
-                {
-                    case BinanceEventType.Kline:
-                        var json = Configuration.Encoding.GetString(streamData);
-                        var kline = JsonConvert.DeserializeObject<BinanceKlineCandlestickData>(json, IBinanceStreamData.GetSerializationSettings());
-                        GetStreamData(BinanceStreamType.KlineCandlestick).Remove(kline.Symbol);
-                        GetStreamData(BinanceStreamType.KlineCandlestick).Add(kline.Symbol, kline);
-                        break;
-                    default: break;
-                }
+            var json = Configuration.Encoding.GetString(streamData);
+            var settings = IBinanceStreamData.GetSerializationSettings();
+            switch (type)
+            {
+                case BinanceEventType.Kline:
+                    var kline = JsonConvert.DeserializeObject<BinanceKlineCandlestickData>(json,settings);
+                    _eventBus.Publish(new KlineDataReceivedEvent(kline.Symbol, new BinanceKlineHistoricalData(kline.Data)));
+                    GetStreamData(BinanceStreamType.KlineCandlestick).Remove(kline.Symbol);
+                    GetStreamData(BinanceStreamType.KlineCandlestick).Add(kline.Symbol, kline);
+                    break;
+                case BinanceEventType.OneDayRollingWindow or BinanceEventType.OneHourRollingWindow or BinanceEventType.FourHoursRollingWindow:
+                    var data = JsonConvert.DeserializeObject<BinanceRollingWindowStatsData>(json, settings);
+                    GetStreamData(BinanceStreamType.IndividualRollingWindowStats).Remove(data.Symbol);
+                    GetStreamData(BinanceStreamType.IndividualRollingWindowStats).Add(data.Symbol, data);
+                    break;
+                case BinanceEventType.PartialBookDepth:
+                    var depth = JsonConvert.DeserializeObject<BinancePartialBookDepthData>(json, settings);
+                    GetStreamData(BinanceStreamType.PartialBookDepth).Add(depth.lastUpdateId.ToString(), depth);
+                    break;
+                default: break;
+            }
         }
 
 
@@ -250,6 +275,13 @@ namespace BinanceAPI.NET.Core.Models
             var jsonBytes = Encoding.UTF8.GetBytes(json);
             return Task.FromResult(jsonBytes);
         }
+
+        //private Task<BinanceStreamResponse<BinanceStreamData>> CreateRollingWindowResponse(string json, JsonSerializerOptions options)
+        //{
+        //    var response = new BinanceStreamResponse<BinanceStreamData>();
+        //    response.EventType = 
+        //    return Task.FromResult(result);
+        //}
         private uint NextId()
         {
             return lastRequestId++;

@@ -16,9 +16,10 @@ namespace BinanceAPI.NET.Core.Models.Streams
         {
         }
 
-        public void SubscribeAsync(string symbol, BinanceStatisticsRollingWindowSize? windowSize = BinanceStatisticsRollingWindowSize.OneHour)
+        public Task SubscribeAsync(string symbol, BinanceStatisticsRollingWindowSize? windowSize = BinanceStatisticsRollingWindowSize.OneHour)
         {
             Client.SubscribeAsync(symbol.ToLower() + StreamType.GetStringValue()! + windowSize!.GetStringValue());
+            return Task.CompletedTask;
         }
        
     }

@@ -18,9 +18,10 @@ namespace BinanceAPI.NET.Core.Models.Streams
         {
         }
 
-        public void Subscribe(string symbol)
+        public Task SubscribeAsync(string symbol, BinancePartialBookDepthLevels depth = BinancePartialBookDepthLevels.Ten)
         {
-            Client.SubscribeAsync(symbol.ToLower() + StreamType.GetStringValue());
+            Client.SubscribeAsync(symbol.ToLower() + StreamType.GetStringValue() + depth.GetStringValue());
+            return Task.CompletedTask;
         }
 
     }

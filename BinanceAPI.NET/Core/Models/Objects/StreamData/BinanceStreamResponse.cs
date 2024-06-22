@@ -18,6 +18,8 @@ namespace BinanceAPI.NET.Core.Models.Objects.StreamData
         public DateTime TimeStamp { get; set; }
         [JsonProperty("s")]
         public string Symbol { get; set; }
+        [JsonProperty("lastUpdateId")]
+        public long? lastUpdateId { get; set; }
         [JsonProperty("k")]
         public T? Data { get; set; }
     }

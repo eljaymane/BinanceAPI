@@ -10,7 +10,9 @@ namespace BinanceAPI.NET.Core.Interfaces
         {
             var serializationSettings = new JsonSerializerSettings
             {
-                Converters = { new UnixTimestampDateConverter(), new KlineIntervalJsonConverter(), new BinanceEventTypeConverter(), new BinanceStatisticsRollingWindowSizeConverter() }
+                Converters = { new UnixTimestampDateConverter(), new KlineIntervalJsonConverter()
+                , new BinanceEventTypeConverter(), new BinanceStatisticsRollingWindowSizeConverter() 
+                ,new BinancePartialBookDepthLevelsConverter()}
             };
             return serializationSettings;
         }

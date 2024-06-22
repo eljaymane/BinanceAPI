@@ -2,11 +2,14 @@
 using BinanceAPI.NET.Core.Models;
 using BinanceAPI.NET.Core.Models.Enums;
 using BinanceAPI.NET.Core.Models.Objects.StreamData;
+using BinanceAPI.NET.Core.Stats;
+using BinanceAPI.NET.Core.Stats.Historical.Klines;
 using BinanceAPI.NET.Infrastructure.Connectivity.Socket.Configuration;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using PEzbus;
 using System.Reflection.Metadata.Ecma335;
 
 static void ConfigureServices(IServiceCollection services)
@@ -33,9 +36,13 @@ static IHostBuilder CreateHostBuilder(string[] args)
 
 
 }
-var serviceCollection = new ServiceCollection();
-ConfigureServices(serviceCollection);
-var serviceProvider = serviceCollection.BuildServiceProvider();
+var services = new ServiceCollection();
+services
+    .AddSingleton<IPEzEventBus,PEzEventBus>()
+    .AddScoped<BinanceHistoricalKlineService>();
+
+ConfigureServices(services);
+var serviceProvider = services.BuildServiceProvider();
 
 
 using var loggerFactory = LoggerFactory.Create(builder =>
@@ -45,13 +52,12 @@ using var loggerFactory = LoggerFactory.Create(builder =>
         .AddFilter("System", LogLevel.Warning)
         .AddFilter("LoggingConsoleApp.Program", LogLevel.Debug)
         .AddConsole();
+    
 });
 var builder = CreateHostBuilder(args).ConfigureServices((_, services) => services
             .AddLogging(configure =>
             configure.AddConsole()
-            )
-                    
-                    );
+            ));
 
 
 
@@ -59,16 +65,28 @@ var host = builder.Build();
 
 var uri = new Uri("wss://stream.binance.com:9443/ws");
 var configuration = new SocketConfiguration(uri, true);
-BinanceMarketDataService client = new(loggerFactory,configuration,new CancellationTokenSource());
-client.KlineCandlestickStream.SubscribeAsync(KlineInterval.OneSecond, "BTCUSDT");
+var eventBus = serviceProvider.GetRequiredService<IPEzEventBus>();
+
+BinanceHistoricalKlineService service = serviceProvider.GetRequiredService<BinanceHistoricalKlineService>();
+BinanceMarketStats stats = new("BTCUSDT");
+eventBus.Register(stats);
+eventBus.Register(service);
+service.DonwloadAndProcess("BTCUSDT", "2024", "05", KlineInterval.FourHours);
+service.DonwloadAndProcess("BTCUSDT", "2024", "06", KlineInterval.FourHours);
+BinanceMarketDataService client = new(loggerFactory,configuration,new CancellationTokenSource(),eventBus);
+//client.KlineCandlestickStream.SubscribeAsync("BTCUSDT", KlineInterval.OneSecond);
+await client.KlineCandlestickStream.SubscribeAsync("BTCUSDT",KlineInterval.FourHours);
 var threadData = new Thread(() =>
 {
     while (true)
     {
         try
         {
-            BinanceKlineCandlestickData data = (BinanceKlineCandlestickData)client.GetStreamData(BinanceStreamType.KlineCandlestick,"BTCUSDT");
-            if (data != null) Console.WriteLine(data.Data.ClosePrice);
+           // BinanceKlineCandlestickData data = (BinanceKlineCandlestickData)client.GetStreamData(BinanceStreamType.KlineCandlestick,"BTCUSDT");
+            BinanceKlineCandlestickData data1 = (BinanceKlineCandlestickData)client.GetStreamData(BinanceStreamType.KlineCandlestick,"BTCUSDT");
+            Console.WriteLine(stats.GetStats());
+            //if (data != null) Console.WriteLine($"Kline BTCUSDT : {data.Data.ClosePrice}");
+            if (data1 != null) Console.WriteLine($"Kline BTCUSDT : {data1.Data.HighPrice}");
         }
         catch (Exception) { }
         finally { Thread.Sleep(2000); }
